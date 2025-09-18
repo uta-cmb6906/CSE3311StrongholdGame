@@ -15,7 +15,7 @@ public class Tile : MonoBehaviour
 
     private float _terrainModifier = 1;
     private bool _isDeveloped = false;
-    private BaseUnit _unitStationed;
+    public BaseUnit _unitStationed;
 
     public void Specialize(string terrain)
     {
@@ -70,5 +70,28 @@ public class Tile : MonoBehaviour
     void OnMouseExit()
     {
         Highlight(false);
+    }
+
+    void OnMouseDown()
+    {
+        if (GameManager.Instance.GameState != GameState.PlayerTurn) return;
+        Debug.Log("...");
+
+        if (IsOccupied())
+        {
+            if (_unitStationed.isPlayer) UnitManager.Instance.SelectUnit(_unitStationed);
+            else if (UnitManager.Instance.SelectedUnit != null)
+            {
+                var enemy = _unitStationed;
+                UnitManager.Instance.SelectedUnit.Attack(enemy);
+                UnitManager.Instance.SelectUnit(null);
+            }
+            //else display tile info
+        }
+        else if (UnitManager.Instance.SelectedUnit != null)
+        {
+            UnitManager.Instance.SelectedUnit.Move(this);
+        }
+        //else display tile info
     }
 }

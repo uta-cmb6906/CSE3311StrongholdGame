@@ -6,16 +6,25 @@ using TMPro;
 using System;
 using System.Linq;
 
-public class GameLogic : MonoBehaviour
+public class GridManager : MonoBehaviour
 {
+    public static GridManager Instance;
     private int _width = 20, _height = 10;
     [SerializeField] private Tile _tileprefab;
     [SerializeField] private Transform _cam;
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
 
-    private void Start()
+    void Awake()
     {
-        GenerateGrid();
+        if (Instance == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void GenerateGrid()
@@ -32,6 +41,7 @@ public class GameLogic : MonoBehaviour
         }
         SpecializeTiles();
         CenterCamera();
+        GameManager.Instance.ChangeState(GameState.SpawnPlayer);
     }
 
     public void SpecializeTiles()
