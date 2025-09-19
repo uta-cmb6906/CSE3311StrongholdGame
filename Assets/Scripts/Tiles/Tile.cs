@@ -23,8 +23,8 @@ public class Tile : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (GameManager.Instance.GameState != GameState.PlayerTurn) return;
         Debug.Log("...");
+        if (GameManager.Instance.GameState != GameState.PlayerTurn) return;
 
         if (IsOccupied())
         {
