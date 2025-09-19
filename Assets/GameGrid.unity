@@ -175,6 +175,30 @@ PrefabInstance:
       propertyPath: _cam
       value: 
       objectReference: {fileID: 946658486}
+    - target: {fileID: 8211902525092227614, guid: b201189923e44fb4caaf8076e0a173b8, type: 3}
+      propertyPath: city
+      value: 
+      objectReference: {fileID: 8877311602190167834, guid: 2cb718ab40a76f34297105d46feb7990, type: 3}
+    - target: {fileID: 8211902525092227614, guid: b201189923e44fb4caaf8076e0a173b8, type: 3}
+      propertyPath: river
+      value: 
+      objectReference: {fileID: 4770999190887289366, guid: df09ce3eb8aeb3f4a84ce1688edb0127, type: 3}
+    - target: {fileID: 8211902525092227614, guid: b201189923e44fb4caaf8076e0a173b8, type: 3}
+      propertyPath: forest
+      value: 
+      objectReference: {fileID: 5716278629876380415, guid: 0506c004cd8319645aa32fbbc44d0bf3, type: 3}
+    - target: {fileID: 8211902525092227614, guid: b201189923e44fb4caaf8076e0a173b8, type: 3}
+      propertyPath: plains
+      value: 
+      objectReference: {fileID: 5640415838735569843, guid: 0729a7aa70f89db4eb3d7ffe648a10f7, type: 3}
+    - target: {fileID: 8211902525092227614, guid: b201189923e44fb4caaf8076e0a173b8, type: 3}
+      propertyPath: mountain
+      value: 
+      objectReference: {fileID: 8460512929640050237, guid: db9e0d2f5414d0a4093b1c50fc2ceb3b, type: 3}
+    - target: {fileID: 8211902525092227614, guid: b201189923e44fb4caaf8076e0a173b8, type: 3}
+      propertyPath: rallyPoint
+      value: 
+      objectReference: {fileID: 4978834772652963849, guid: 0e422b5f76b440b499e37bc4e0a2b2b4, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -10,7 +10,12 @@ public class GridManager : MonoBehaviour
 {
     public static GridManager Instance;
     private int _width = 20, _height = 10;
-    [SerializeField] private Tile _tileprefab;
+    [SerializeField] private PlainsTile plains;
+    [SerializeField] private ForestTile forest;
+    [SerializeField] private RiverTile river;
+    [SerializeField] private MountainTile mountain;
+    [SerializeField] private CityTile city;
+    [SerializeField] private RallyPointTile rallyPoint;
     [SerializeField] private Transform _cam;
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
 
@@ -27,35 +32,68 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    public void GenerateGrid()
+    public void GenerateGrid(string map)
     {
-        for (int x = 0; x < _width; x++)
-        {
-            for (int y = 0; y < _height; y++)
-            {
-                var spawnedTile = Instantiate(_tileprefab, new Vector3(x, y), Quaternion.identity);
-                spawnedTile.name = $"Tile {x} {y}";
-
-                tiles[new Vector2(x, y)] = spawnedTile;
-            }
-        }
-        SpecializeTiles();
+        CreateSpecialTiles(map);
+        CreatePlainsTiles();
         CenterCamera();
         GameManager.Instance.ChangeState(GameState.SpawnPlayer);
     }
 
-    public void SpecializeTiles()
+    private void CreateSpecialTiles(string map)
     {
-        TextAsset csvFile = Resources.Load<TextAsset>("MapData");
+        TextAsset csvFile = Resources.Load<TextAsset>(map);
         string[] lines = csvFile.text.Split('\n');
 
         //each line in MapData.csv holds x and y of special tile and its terrain type (x y type)
         foreach (var line in lines)
         {
             var tileData = line.Replace("\n", "").Replace("\r", "").Split(' ');
-            Vector2 position = new Vector2(float.Parse(tileData[0]), float.Parse(tileData[1]));
-            Tile tile = GetTileAtPosition(position);
-            tile.Specialize(tileData[2]);
+            int x = int.Parse(tileData[0]);
+            int y = int.Parse(tileData[1]);
+            Tile tileType = null;
+
+            //get prefab of specified tile type
+            switch (tileData[2])
+            {
+                case "forest":
+                    tileType = forest;
+                    break;
+                case "river":
+                    tileType = river;
+                    break;
+                case "mountain":
+                    tileType = mountain;
+                    break;
+                case "city":
+                    tileType = city;
+                    break;
+                case "rallyPoint":
+                    tileType = rallyPoint;
+                    break;
+            }
+
+            //create and name tile, and add to dictionary
+            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
+            spawnedTile.name = $"Tile {x} {y}";
+            tiles[new Vector2(x, y)] = spawnedTile;
+        }
+    }
+
+    //fill in empty tile spots with plains
+    private void CreatePlainsTiles()
+    {
+        for (int x = 0; x < _width; x++)
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                if (GetTileAtPosition(new Vector2(x, y)) == null)
+                {
+                    var spawnedTile = Instantiate(plains, new Vector3(x, y), Quaternion.identity);
+                    spawnedTile.name = $"Tile {x} {y}";
+                    tiles[new Vector2(x, y)] = spawnedTile;
+                }
+            }
         }
     }
 
