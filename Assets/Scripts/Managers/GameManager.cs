@@ -39,11 +39,8 @@ public class GameManager : MonoBehaviour
             case GameState.GenerateGrid:
                 GridManager.Instance.GenerateGrid("MapData");
                 break;
-            case GameState.SpawnPlayer:
-                UnitManager.Instance.SpawnPlayer("examplePlayer");
-                break;
-            case GameState.SpawnEnemy:
-                UnitManager.Instance.SpawnEnemy("exampleEnemy");
+            case GameState.SpawnFactions:
+                UnitManager.Instance.SpawnFactions("examplePlayer", "exampleEnemy");
                 break;
             case GameState.PlayerTurn:
                 break;
@@ -60,8 +57,7 @@ public class GameManager : MonoBehaviour
 public enum GameState
 {
     GenerateGrid,
-    SpawnPlayer,
-    SpawnEnemy,
+    SpawnFactions,
     PlayerTurn,
     EnemyTurn
 }

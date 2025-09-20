@@ -38,17 +38,17 @@ public class GridManager : MonoBehaviour
         CreateSpecialTiles(map);
         CreatePlainsTiles();
         CenterCamera();
-        GameManager.Instance.ChangeState(GameState.SpawnPlayer);
+        GameManager.Instance.ChangeState(GameState.SpawnFactions);
     }
 
     //use povided map to populate all special tiles on map
     private void CreateSpecialTiles(string map)
     {
-        //find specified faction csv file
+        //find specified map csv file
         TextAsset csvFile = Resources.Load<TextAsset>(map);
         string[] lines = csvFile.text.Split('\n');
 
-        //each line in MapData.csv holds x and y of special tile and its terrain type (x y type)
+        //each line in map.csv holds x and y coordinates of special tile and its terrain type (x y type)
         foreach (var line in lines)
         {
             var tileData = line.Replace("\n", "").Replace("\r", "").Split(' ');
