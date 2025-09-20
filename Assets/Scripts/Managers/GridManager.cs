@@ -19,6 +19,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Transform _cam;
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
 
+    //ensure all scenes are using the same instance of the manager
     void Awake()
     {
         if (Instance == null)
@@ -40,8 +41,10 @@ public class GridManager : MonoBehaviour
         GameManager.Instance.ChangeState(GameState.SpawnPlayer);
     }
 
+    //use povided map to populate all special tiles on map
     private void CreateSpecialTiles(string map)
     {
+        //find specified faction csv file
         TextAsset csvFile = Resources.Load<TextAsset>(map);
         string[] lines = csvFile.text.Split('\n');
 
@@ -73,10 +76,7 @@ public class GridManager : MonoBehaviour
                     break;
             }
 
-            //create and name tile, and add to dictionary
-            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
-            spawnedTile.name = $"Tile {x} {y}";
-            tiles[new Vector2(x, y)] = spawnedTile;
+            CreateTile(x, y, tileType);
         }
     }
 
@@ -87,14 +87,18 @@ public class GridManager : MonoBehaviour
         {
             for (int y = 0; y < _height; y++)
             {
-                if (GetTileAtPosition(new Vector2(x, y)) == null)
-                {
-                    var spawnedTile = Instantiate(plains, new Vector3(x, y), Quaternion.identity);
-                    spawnedTile.name = $"Tile {x} {y}";
-                    tiles[new Vector2(x, y)] = spawnedTile;
-                }
+                //if no tile at location make plains tile
+                if (GetTileAtPosition(new Vector2(x, y)) == null) CreateTile(x, y, plains);
             }
         }
+    }
+
+    //create tile of specified terrain type add to dictionary
+    private void CreateTile(int x, int y, Tile tileType)
+    {   
+        var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
+        spawnedTile.name = $"Tile {x} {y}";
+        tiles[new Vector2(x, y)] = spawnedTile;
     }
 
     public void CenterCamera()

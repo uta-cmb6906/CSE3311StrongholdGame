@@ -9,6 +9,7 @@ public class UnitManager : MonoBehaviour
     private List<ScriptableUnit> _units;
     public BaseUnit SelectedUnit;
 
+    //ensure all scenes are using the same instance of the manager
     void Awake()
     {
         if (Instance == null)
@@ -24,8 +25,10 @@ public class UnitManager : MonoBehaviour
         _units = Resources.LoadAll<ScriptableUnit>("Units").ToList();
     }
 
+    //use provided faction to create all player units
     public void SpawnPlayer(string faction)
     {
+        //find specified faction csv file
         TextAsset csvFile = Resources.Load<TextAsset>("Factions/" + faction);
         string[] lines = csvFile.text.Split('\n');
 
@@ -43,8 +46,10 @@ public class UnitManager : MonoBehaviour
         GameManager.Instance.ChangeState(GameState.SpawnEnemy);
     }
 
+    //use provided faction to create all enemy units
     public void SpawnEnemy(string faction)
     {
+        //find specified faction csv file
         TextAsset csvFile = Resources.Load<TextAsset>("Factions/" + faction);
         string[] lines = csvFile.text.Split('\n');
 

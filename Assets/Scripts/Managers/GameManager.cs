@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     public static event Action<GameState> OnGameStateChanged;
 
+    //ensure all scenes are using the same instance of the manager
     void Awake()
     {
         if (Instance == null)
@@ -21,12 +22,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //start on state generate Grid
     void Start()
     {
         //Instantiate(GridManager);
+    //TODO eventually start at start menu
         ChangeState(GameState.GenerateGrid);
     }
 
+    //change game state (initiating state logic), and broadcast state change event
     public void ChangeState(GameState newState)
     {
         GameState = newState;
