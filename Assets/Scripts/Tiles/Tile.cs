@@ -84,6 +84,11 @@ public class Tile : MonoBehaviour
         ;
     }
 
+    void HighlightTile()
+    {
+        _highlight.SetActive(true);
+    }
+
     void OnMouseDown()
     {
         EvaluateSelectedTile();
@@ -91,7 +96,7 @@ public class Tile : MonoBehaviour
 
     void OnMouseEnter()
     {
-        _highlight.SetActive(true);
+        HighlightTile();
     }
 
     void OnMouseExit()

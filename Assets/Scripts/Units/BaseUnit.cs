@@ -95,11 +95,11 @@ public class BaseUnit : MonoBehaviour
     //increase all unit stats by 20%
     public void UpgradeUnit()
     {
-        maxHealth = (int)maxHealth * 1.2f;
-        health = (int)health * 1.2f;
-        defense = (int)defense * 1.2f;
-        meleeDamage = (int)meleeDamage * 1.2f;
-        rangedDamage = (int)rangedDamage * 1.2f;
+        maxHealth = (int) (maxHealth * 1.2f);
+        health = (int) (health * 1.2f);
+        defense = (int) (defense * 1.2f);
+        meleeDamage = (int) (meleeDamage * 1.2f);
+        rangedDamage = (int) (rangedDamage * 1.2f);
     }
 
     private void UpdateHealthBar()
