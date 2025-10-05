@@ -97,6 +97,7 @@ public class GridManager : MonoBehaviour
     private void CreateTile(int x, int y, Tile tileType)
     {   
         var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
+        spawnedTile.SetCoords(x, y);
         spawnedTile.name = $"Tile {x} {y}";
         tiles[new Vector2(x, y)] = spawnedTile;
     }

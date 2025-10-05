@@ -9,33 +9,28 @@ public class Tile : MonoBehaviour
 
     [SerializeField] protected float _terrainModifier;
     [SerializeField] protected bool _isDeveloped;
+    [SerializeField] protected int x;
+    [SerializeField] protected int y;
 
     [SerializeField] private GameObject _highlight;
     public BaseUnit _unitStationed;
 
+    public int X() => x;
+    public int Y() => y;
     public bool IsOccupied() => _unitStationed != null;
     public bool IsDeveloped() => _isDeveloped;
     public float TerrainModifier() => _terrainModifier;
     public BaseUnit GetStationedUnit() => _unitStationed;
 
+    public void SetCoords(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
     public void ChangeStationed(BaseUnit newUnit)
     {
         _unitStationed = newUnit;
-    }
-
-    void OnMouseDown()
-    {
-        EvaluateSelectedTile();
-    }
-
-    void OnMouseEnter()
-    {
-        _highlight.SetActive(true);
-    }
-
-    void OnMouseExit()
-    {
-        _highlight.SetActive(false);
     }
 
     private void EvaluateSelectedTile()
@@ -82,5 +77,25 @@ public class Tile : MonoBehaviour
     public string TileInfo()
     {
         return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense";
+    }
+
+    public void DisplayTileInfo()
+    {
+        ;
+    }
+
+    void OnMouseDown()
+    {
+        EvaluateSelectedTile();
+    }
+
+    void OnMouseEnter()
+    {
+        _highlight.SetActive(true);
+    }
+
+    void OnMouseExit()
+    {
+        _highlight.SetActive(false);
     }
 }
