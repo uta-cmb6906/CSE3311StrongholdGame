@@ -79,8 +79,8 @@ public class Tile : MonoBehaviour
         else DisplayTileInfo();
     }
 
-    public void DisplayTileInfo()
+    public string TileInfo()
     {
-        ;
+        return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense";
     }
 }

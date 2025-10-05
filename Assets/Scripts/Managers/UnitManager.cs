@@ -25,7 +25,7 @@ public class UnitManager : MonoBehaviour
         _units = Resources.LoadAll<ScriptableUnit>("Units").ToList();
     }
 
-    //Spwn all player and enemy units
+    //Spawn all initial player and enemy units
     public void SpawnFactions(string playerFaction, string enemyFaction)
     {
         SpawnFactionUnits(playerFaction, Team.Player);

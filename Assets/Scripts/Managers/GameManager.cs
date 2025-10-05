@@ -25,7 +25,6 @@ public class GameManager : MonoBehaviour
     //start on state generate Grid
     void Start()
     {
-        //Instantiate(GridManager);
     //TODO eventually start at start menu
         ChangeState(GameState.GenerateGrid);
     }
