@@ -65,6 +65,10 @@ public class UnitManager : MonoBehaviour
 
     public void SelectUnit(BaseUnit unit)
     {
+        //unhighlight valid tiles for previously selected unit
+        if (SelectedUnit) SelectedUnit.UnhighlightValidTiles();
         SelectedUnit = unit;
+        //highlight selected units valid tiles
+        if (SelectedUnit) SelectedUnit.HighlightValidTiles();
     }
 }

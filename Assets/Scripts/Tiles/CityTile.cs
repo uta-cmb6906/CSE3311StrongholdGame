@@ -7,4 +7,6 @@ public class CityTile : Tile
     //have way to change owner
 
     //overwrite TileInfo to also return production and owner
+
+    //have some way to visually show ownership on map
 }

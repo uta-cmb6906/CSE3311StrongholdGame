@@ -13,6 +13,7 @@ public class Tile : MonoBehaviour
     [SerializeField] protected int y;
 
     [SerializeField] private GameObject _highlight;
+    private bool forceHighlight = false;
     public BaseUnit _unitStationed;
 
     public int X() => x;
@@ -84,9 +85,17 @@ public class Tile : MonoBehaviour
         ;
     }
 
-    void HighlightTile()
+    //if force is true prevent OnMouseExit from removing highlight
+    public void HighlightTile(bool force)
     {
+        if (force) forceHighlight = true;
         _highlight.SetActive(true);
+    }
+
+    public void UnhighlightTile()
+    {
+        forceHighlight = false;
+        _highlight.SetActive(false);
     }
 
     void OnMouseDown()
@@ -96,11 +105,11 @@ public class Tile : MonoBehaviour
 
     void OnMouseEnter()
     {
-        HighlightTile();
+        HighlightTile(false);
     }
 
     void OnMouseExit()
     {
-        _highlight.SetActive(false);
+        if(!forceHighlight) UnhighlightTile();
     }
 }

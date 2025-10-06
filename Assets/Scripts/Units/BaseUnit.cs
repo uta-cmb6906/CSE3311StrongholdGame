@@ -31,6 +31,47 @@ public class BaseUnit : MonoBehaviour
         //TODO apply special faction modifiers
     }
 
+    //highlight all of a units valid tiles blue for within movement range and red for attackable
+    public void HighlightValidTiles()
+    {
+        //highlight empty tiles within movement range in blue
+        for (int x = OccupiedTile.X() - movementRange; x <= OccupiedTile.X() + movementRange; x++)
+        {
+            for (int y = OccupiedTile.Y() - movementRange; y <= OccupiedTile.Y() + movementRange; y++)
+            {
+                Tile tile = GridManager.Instance.GetTileAtPosition(new Vector3(x, y));
+                if (tile && !tile.IsOccupied()) tile.HighlightTile(true);
+            }
+        }
+
+        //highlight enemies within attack range in red
+        for (int x = OccupiedTile.X() - attackRange; x <= OccupiedTile.X() + attackRange; x++)
+        {
+            for (int y = OccupiedTile.Y() - attackRange; y <= OccupiedTile.Y() + attackRange; y++)
+            {
+                Tile tile = GridManager.Instance.GetTileAtPosition(new Vector3(x, y));
+                if (tile && tile.IsOccupied() && !tile.GetStationedUnit().isPlayer) tile.HighlightTile(true);
+            }
+        }
+    }
+
+    //unhighlight all of a units valid tiles
+    public void UnhighlightValidTiles()
+    {
+        //range is largest between attack and movement range
+        int range = (movementRange >= attackRange) ? movementRange : attackRange;
+
+        //unhighlight all tiles within range
+        for (int x = OccupiedTile.X() - range; x <= OccupiedTile.X() + range; x++)
+        {
+            for (int y = OccupiedTile.Y() - range; y <= OccupiedTile.Y() + range; y++)
+            {
+                Tile tile = GridManager.Instance.GetTileAtPosition(new Vector3(x, y));
+                if (tile && !tile.IsOccupied()) tile.UnhighlightTile();
+            }
+        }
+    }
+
     //try to move to tile returning true if successful or false if tile out of range
     public bool AttemptMovement(Tile destination)
     {
@@ -47,6 +88,7 @@ public class BaseUnit : MonoBehaviour
 
     public void Move(Tile destination)
     {
+        UnhighlightValidTiles();
         OccupiedTile._unitStationed = null;
         OccupiedTile = destination;
         OccupiedTile._unitStationed = this;
