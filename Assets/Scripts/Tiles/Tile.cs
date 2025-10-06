@@ -13,6 +13,7 @@ public class Tile : MonoBehaviour
     [SerializeField] protected int y;
 
     [SerializeField] private GameObject _highlight;
+    SpriteRenderer highlightRenderer;
     private bool forceHighlight = false;
     public BaseUnit _unitStationed;
 
@@ -22,6 +23,11 @@ public class Tile : MonoBehaviour
     public bool IsDeveloped() => _isDeveloped;
     public float TerrainModifier() => _terrainModifier;
     public BaseUnit GetStationedUnit() => _unitStationed;
+
+    void Start()
+    {
+        highlightRenderer = _highlight.GetComponent<SpriteRenderer>();
+    }
 
     public void SetCoords(int x, int y)
     {
@@ -85,9 +91,11 @@ public class Tile : MonoBehaviour
         ;
     }
 
-    //if force is true prevent OnMouseExit from removing highlight
-    public void HighlightTile(bool force)
+    //highlight the tile the specified color, and if force is true prevent OnMouseExit from removing highlight
+    public void HighlightTile(Color color, bool force)
     {
+        color.a = .25f;
+        highlightRenderer.color = color;
         if (force) forceHighlight = true;
         _highlight.SetActive(true);
     }
@@ -105,7 +113,7 @@ public class Tile : MonoBehaviour
 
     void OnMouseEnter()
     {
-        HighlightTile(false);
+        if(!forceHighlight) HighlightTile(Color.white, false);
     }
 
     void OnMouseExit()

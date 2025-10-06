@@ -40,7 +40,7 @@ public class BaseUnit : MonoBehaviour
             for (int y = OccupiedTile.Y() - movementRange; y <= OccupiedTile.Y() + movementRange; y++)
             {
                 Tile tile = GridManager.Instance.GetTileAtPosition(new Vector3(x, y));
-                if (tile && !tile.IsOccupied()) tile.HighlightTile(true);
+                if (tile && !tile.IsOccupied()) tile.HighlightTile(Color.blue, true);
             }
         }
 
@@ -50,7 +50,7 @@ public class BaseUnit : MonoBehaviour
             for (int y = OccupiedTile.Y() - attackRange; y <= OccupiedTile.Y() + attackRange; y++)
             {
                 Tile tile = GridManager.Instance.GetTileAtPosition(new Vector3(x, y));
-                if (tile && tile.IsOccupied() && !tile.GetStationedUnit().isPlayer) tile.HighlightTile(true);
+                if (tile && tile.IsOccupied() && !tile.GetStationedUnit().isPlayer) tile.HighlightTile(Color.red, true);
             }
         }
     }
@@ -67,7 +67,7 @@ public class BaseUnit : MonoBehaviour
             for (int y = OccupiedTile.Y() - range; y <= OccupiedTile.Y() + range; y++)
             {
                 Tile tile = GridManager.Instance.GetTileAtPosition(new Vector3(x, y));
-                if (tile && !tile.IsOccupied()) tile.UnhighlightTile();
+                if (tile) tile.UnhighlightTile();
             }
         }
     }
