@@ -50,8 +50,12 @@ MonoBehaviour:
   _renderer: {fileID: 2636989528109562278}
   _terrainModifier: 1
   _isDeveloped: 1
+  x: 0
+  y: 0
   _highlight: {fileID: 7042459898348438484}
   _unitStationed: {fileID: 0}
+  isPlayer: 0
+  plainsTile: {fileID: 3117132712169103162, guid: 0729a7aa70f89db4eb3d7ffe648a10f7, type: 3}
 --- !u!212 &2636989528109562278
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -99,7 +103,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 5836264756618240915, guid: dd992ebcfc83e4bc394c7a3820f19e5d, type: 3}
   m_Color: {r: 0.6980392, g: 0.1333333, b: 0.1333333, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -148,7 +152,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.53, y: 1}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

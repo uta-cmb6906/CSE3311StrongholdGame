@@ -9,6 +9,7 @@ public class Tile : MonoBehaviour
 
     [SerializeField] protected float _terrainModifier;
     [SerializeField] protected bool _isDeveloped;
+    [SerializeField] public bool isPlayer;
     [SerializeField] protected int x;
     [SerializeField] protected int y;
 
@@ -81,7 +82,7 @@ public class Tile : MonoBehaviour
         else DisplayTileInfo();
     }
 
-    public string TileInfo()
+    public virtual string TileInfo()
     {
         return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense";
     }

@@ -48,6 +48,7 @@ MonoBehaviour:
   forest: {fileID: 5716278629876380415, guid: 0506c004cd8319645aa32fbbc44d0bf3, type: 3}
   river: {fileID: 4770999190887289366, guid: df09ce3eb8aeb3f4a84ce1688edb0127, type: 3}
   mountain: {fileID: 8460512929640050237, guid: db9e0d2f5414d0a4093b1c50fc2ceb3b, type: 3}
-  city: {fileID: 8877311602190167834, guid: 2cb718ab40a76f34297105d46feb7990, type: 3}
+  userCity: {fileID: 8877311602190167834, guid: 2cb718ab40a76f34297105d46feb7990, type: 3}
+  enemyCity: {fileID: 8877311602190167834, guid: 506306ee81b3748f2bbd93f35918f77f, type: 3}
   rallyPoint: {fileID: 4978834772652963849, guid: 0e422b5f76b440b499e37bc4e0a2b2b4, type: 3}
   _cam: {fileID: 0}

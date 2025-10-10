@@ -140,6 +140,8 @@ MonoBehaviour:
   _renderer: {fileID: 2516771266612833702}
   _terrainModifier: 1.5
   _isDeveloped: 0
+  x: 0
+  y: 0
   _highlight: {fileID: 3486842424418340440}
   _unitStationed: {fileID: 0}
 --- !u!212 &2516771266612833702
@@ -167,7 +169,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: -876546973899608171, guid: cbd3e1cc4ae141c42a30e33b4d666a61, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -189,7 +191,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 5362339452504853210, guid: 1004a82d5dc784ea59dbe23b16d10df3, type: 3}
   m_Color: {r: 0.254902, g: 0.4117647, b: 0.882353, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -238,7 +240,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 0.9, y: 1}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

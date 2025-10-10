@@ -5,16 +5,17 @@ using System.IO;
 using TMPro;
 using System;
 using System.Linq;
+using NUnit.Framework;
 
 public class GridManager : MonoBehaviour
 {
     public static GridManager Instance;
     private int _width = 20, _height = 10;
-    [SerializeField] private PlainsTile plains;
+    [SerializeField] public PlainsTile plains;
     [SerializeField] private ForestTile forest;
     [SerializeField] private RiverTile river;
     [SerializeField] private MountainTile mountain;
-    [SerializeField] private CityTile city;
+    [SerializeField] private CityTile userCity, enemyCity;
     [SerializeField] private RallyPointTile rallyPoint;
     [SerializeField] private Transform _cam;
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
@@ -55,6 +56,7 @@ public class GridManager : MonoBehaviour
             int x = int.Parse(tileData[0]);
             int y = int.Parse(tileData[1]);
             Tile tileType = null;
+            int isPlayer = 0;
 
             //get prefab of specified tile type
             switch (tileData[2])
@@ -68,15 +70,25 @@ public class GridManager : MonoBehaviour
                 case "mountain":
                     tileType = mountain;
                     break;
-                case "city":
-                    tileType = city;
+                case "userCity":
+                    tileType = userCity;
+                    isPlayer = 2;
                     break;
-                case "rallyPoint":
+                case "enemyCity":
+                    tileType = enemyCity;
+                    isPlayer = 1;
+                    break;
+                case "userRallyPoint":
                     tileType = rallyPoint;
+                    isPlayer = 2;
+                    break;
+                case "enemyRallyPoint":
+                    tileType = rallyPoint;
+                    isPlayer = 1;
                     break;
             }
 
-            CreateTile(x, y, tileType);
+            CreateTile(x, y, tileType, isPlayer);
         }
     }
 
@@ -88,18 +100,35 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < _height; y++)
             {
                 //if no tile at location make plains tile
-                if (GetTileAtPosition(new Vector2(x, y)) == null) CreateTile(x, y, plains);
+                if (GetTileAtPosition(new Vector2(x, y)) == null) CreateTile(x, y, plains, 0);
             }
         }
     }
 
     //create tile of specified terrain type add to dictionary
-    private void CreateTile(int x, int y, Tile tileType)
-    {   
-        var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
-        spawnedTile.SetCoords(x, y);
-        spawnedTile.name = $"Tile {x} {y}";
-        tiles[new Vector2(x, y)] = spawnedTile;
+    public void CreateTile(int x, int y, Tile tileType, int isPlayer)
+    {
+        if (isPlayer == 0)
+        {
+            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
+            spawnedTile.SetCoords(x, y);
+            spawnedTile.name = $"Tile {x} {y}";
+            tiles[new Vector2(x, y)] = spawnedTile;
+        } else if(isPlayer == 1)
+        {
+            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
+            spawnedTile.isPlayer = false;
+            spawnedTile.SetCoords(x, y);
+            spawnedTile.name = $"Tile {x} {y}";
+            tiles[new Vector2(x, y)] = spawnedTile;
+        } else if(isPlayer == 2)
+        {
+            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
+            spawnedTile.isPlayer = true;
+            spawnedTile.SetCoords(x, y);
+            spawnedTile.name = $"Tile {x} {y}";
+            tiles[new Vector2(x, y)] = spawnedTile;
+        }
     }
 
     public void CenterCamera()

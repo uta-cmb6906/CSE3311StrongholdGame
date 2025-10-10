@@ -1,12 +1,22 @@
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class RallyPointTile : Tile
 {
-    //store owner and in game manager store the location of each factions rally point
 
-    //have way to destroy rally point by turning tile into plains tile
+    public string RallyPointOwnerLoc()
+    {
+        return this.x + " " + this.y + " " + isPlayer;
+    }
+    public void DestroyTile()
+    {
+        GridManager.Instance.CreateTile(this.x, this.y, GridManager.Instance.plains, 0);
+        Destroy(gameObject);
+    }
 
-    //clicking tile opens unit purchase interface
-
-    //overwrite TileInfo to tell purpose of tile
+    //clicking tile opens unit purchase interface (not implemented yet)
+    public override string TileInfo()
+    {
+        return "This tile is where new units will be spawned";
+    }
 }

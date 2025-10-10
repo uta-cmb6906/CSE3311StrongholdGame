@@ -2,11 +2,32 @@ using UnityEngine;
 
 public class CityTile : Tile
 {
-    //store production per turn and owner
 
-    //have way to change owner
+    public int productionAmount, totalGoldPlayer, totalGoldEnemy;
 
-    //overwrite TileInfo to also return production and owner
+    public void AddProduction(int productionAmount)
+    {
+        if (isPlayer)
+            totalGoldPlayer += productionAmount;
+        else
+            totalGoldEnemy += productionAmount;
+    }
 
-    //have some way to visually show ownership on map
+    public void ChangeUser()
+    {
+        if (isPlayer)
+            isPlayer = false;
+        else
+            isPlayer = true;
+    }
+
+    public override string TileInfo()
+    {
+        if (isPlayer)
+            return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense\n" + totalGoldPlayer + " Gold\n" + "Owned by: "; // need to define faction
+        else
+            return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense\n" + totalGoldEnemy + " Gold\n" + "Owned by: "; // need to define faction
+    }
+
+
 }
