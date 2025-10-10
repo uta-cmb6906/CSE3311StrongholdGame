@@ -1,3 +1,3 @@
-# CSE3311TDGame
+# CSE3311StrongholdGame
 
-# Stronghold
+# Stronghold: Medieval Strategy
