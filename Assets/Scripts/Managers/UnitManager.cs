@@ -35,33 +35,53 @@ public class UnitManager : MonoBehaviour
 
     //use provided faction to spawn its units
     public void SpawnFactionUnits(string faction, Team team)
+{
+    // find specified faction csv file
+    TextAsset csvFile = Resources.Load<TextAsset>("Factions/" + faction);
+    string[] lines = csvFile.text.Split('\n');
+
+    // each line in faction.csv holds x and y coordinates of a unit and its type (x y type)
+    foreach (var raw in lines)
     {
-        //find specified faction csv file
-        TextAsset csvFile = Resources.Load<TextAsset>("Factions/" + faction);
-        string[] lines = csvFile.text.Split('\n');
+        var line = raw.Replace("\n", "").Replace("\r", "");
+        if (string.IsNullOrWhiteSpace(line)) continue;
 
-        //each line in faction.csv holds x and y coordinates of a unit and its type (x y type)
-        foreach (var line in lines)
+        var unitData = line.Split(' ');
+
+        Vector2 position = new Vector2(float.Parse(unitData[0]), float.Parse(unitData[1]));
+        Tile spawnTile = GridManager.Instance.GetTileAtPosition(position);
+
+        // find the ScriptableUnit for this team
+        var su = _units.Find(u => u.name == unitData[2] && u.Team == team);
+        if (su == null)
         {
-            var unitData = line.Replace("\n", "").Replace("\r", "").Split(' ');
+            Debug.LogWarning($"ScriptableUnit not found for '{unitData[2]}' ({team})");
+            continue;
+        }
 
-            Vector2 position = new Vector2(float.Parse(unitData[0]), float.Parse(unitData[1]));
-            Tile spawnTile = GridManager.Instance.GetTileAtPosition(position);
+        // Initial spawns are FREE (ignoreCost: true)
+        CreateUnit(su.UnitPrefab, spawnTile, ignoreCost: true, buyer: team, unitCost: su.GoldCost);
+    }
+}
 
-            //find specified prefab of unit getting player/enemy version dependent on provided team
-            var unitType = _units.Find(u => u.name == unitData[2] && u.Team == team).UnitPrefab;
-
-            CreateUnit(unitType, spawnTile);
+    public bool CreateUnit(BaseUnit unit, Tile spawnTile, bool ignoreCost = false, Team buyer = Team.Player, int unitCost = 0)
+{
+    // ECONOMY: gate by gold unless this is an initial spawn
+    if (!ignoreCost)
+    {
+        if (!GameManager.Instance.TrySpendGold(buyer, unitCost))
+        {
+            Debug.Log($"[{buyer}] cannot afford unit (cost {unitCost}).");
+            return false;
         }
     }
 
-    public void CreateUnit(BaseUnit unit, Tile spawnTile)
-    {
-        var spawnedUnit = Instantiate(unit);
-        spawnTile._unitStationed = spawnedUnit;
-        spawnedUnit.OccupiedTile = spawnTile;
-        spawnedUnit.transform.position = spawnTile.transform.position;
-    }
+    var spawnedUnit = Instantiate(unit);
+    spawnTile._unitStationed = spawnedUnit;
+    spawnedUnit.OccupiedTile = spawnTile;
+    spawnedUnit.transform.position = spawnTile.transform.position;
+    return true;
+}
 
     public void SelectUnit(BaseUnit unit)
     {
@@ -77,3 +97,4 @@ public class UnitManager : MonoBehaviour
         if (SelectedUnit) SelectedUnit.HighlightValidTiles();
     }
 }
+
