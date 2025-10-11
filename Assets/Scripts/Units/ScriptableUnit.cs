@@ -7,10 +7,15 @@ public class ScriptableUnit : ScriptableObject
 {
     public Team Team;
     public BaseUnit UnitPrefab;
+
+    [Header("Economy")]
+    public int GoldCost = 100;
 }
 
 public enum Team
 {
+    None,
     Player,
     Enemy
+
 }
