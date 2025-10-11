@@ -66,7 +66,6 @@ public class GameManager : MonoBehaviour
     {
         foreach (var t in _incomeTiles)
         {
-            if (t.Owner == Team.None) continue;
             if (t.IncomePerTurn <= 0) continue;
             AddGold(t.Owner, t.IncomePerTurn);
         }
@@ -153,3 +152,4 @@ public interface ICityIncome
     Team Owner { get; }
     int IncomePerTurn { get; }
 }
+
