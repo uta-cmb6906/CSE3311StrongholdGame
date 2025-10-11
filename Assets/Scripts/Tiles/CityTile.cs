@@ -1,33 +1,56 @@
 using UnityEngine;
 
-public class CityTile : Tile
+// CityTile produces gold for its current owner each turn.
+// GameManager holds the actual gold totals; this tile just declares income.
+public class CityTile : Tile, ICityIncome
 {
+    [Header("Economy")]
+    [Tooltip("Gold this tile pays its owner at the start of a turn")]
+    public int productionAmount = 10;
 
-    public int productionAmount, totalGoldPlayer, totalGoldEnemy;
+    // ---- ICityIncome (used by GameManager.PayoutTurnIncome) ----
+    public Team Owner => isPlayer ? Team.Player : Team.Enemy;
+    public int IncomePerTurn => productionAmount;
 
-    public void AddProduction(int productionAmount)
+    private void OnEnable()
     {
-        if (isPlayer)
-            totalGoldPlayer += productionAmount;
-        else
-            totalGoldEnemy += productionAmount;
+        GameManager.Instance?.RegisterIncomeTile(this);
     }
 
+    private void OnDisable()
+    {
+        GameManager.Instance?.UnregisterIncomeTile(this);
+    }
+
+    // Toggle ownership (keeps your original behavior)
     public void ChangeUser()
     {
-        if (isPlayer)
-            isPlayer = false;
-        else
-            isPlayer = true;
+        isPlayer = !isPlayer;
+        // TODO: update any ownership visuals here (color/flag/etc.)
+    }
+
+    // Optional convenience if you want to set by Team directly
+    public void SetOwner(Team team)
+    {
+        isPlayer = (team == Team.Player);
+    }
+
+    // Backward compatibility: if old code still calls AddProduction,
+    // forward it to the central wallet in GameManager.
+    public void AddProduction(int amount)
+    {
+        GameManager.Instance?.AddGold(Owner, amount);
     }
 
     public override string TileInfo()
     {
-        if (isPlayer)
-            return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense\n" + totalGoldPlayer + " Gold\n" + "Owned by: "; // need to define faction
-        else
-            return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense\n" + totalGoldEnemy + " Gold\n" + "Owned by: "; // need to define faction
+        // Show income-per-turn and the owner's current wallet (from GameManager).
+        int ownerGold = GameManager.Instance != null ? GameManager.Instance.GetGold(Owner) : 0;
+        string ownerText = Owner == Team.Player ? "Player" : "Enemy";
+
+        return $"{GetType().Name}\n+ {_terrainModifier}% Defense\n" +
+               $"+{productionAmount} Gold/turn\n" +
+               $"Owner: {ownerText}\n" +
+               $"Owner Gold: {ownerGold}";
     }
-
-
 }
