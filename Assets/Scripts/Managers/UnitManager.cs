@@ -8,6 +8,7 @@ public class UnitManager : MonoBehaviour
     public static UnitManager Instance;
     private List<ScriptableUnit> _units;
     public BaseUnit SelectedUnit;
+    [SerializeField] private UnitStat unitStatUI;
 
     //ensure all scenes are using the same instance of the manager
     void Awake()
@@ -95,6 +96,12 @@ public class UnitManager : MonoBehaviour
 
         //highlight selected units valid tiles
         if (SelectedUnit) SelectedUnit.HighlightValidTiles();
+
+        //unit stat ui
+        if (unitStatUI != null)
+        {
+            unitStatUI.UpdateUnitStatUI(SelectedUnit);
+        }
     }
 }
 
