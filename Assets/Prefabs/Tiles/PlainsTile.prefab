@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6226522162044661797}
   - component: {fileID: 5640415838735569843}
   - component: {fileID: 3117132712169103162}
-  - component: {fileID: 1196156608737134895}
+  - component: {fileID: 5994693796965257824}
   m_Layer: 0
   m_Name: PlainsTile
   m_TagString: Untagged
@@ -133,7 +133,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 1183898640, guid: 97c1779e22bd07748ad2d7a14a3e3670, type: 3}
-  m_Color: {r: 0.1960784, g: 0.6117647, b: 0.1960784, a: 1}
+  m_Color: {r: 0.1960784, g: 0.6117647, b: 0.1960784, a: 0.92941177}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -143,7 +143,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &1196156608737134895
+--- !u!61 &5994693796965257824
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
