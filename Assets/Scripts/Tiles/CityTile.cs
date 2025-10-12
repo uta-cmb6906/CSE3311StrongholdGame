@@ -12,6 +12,24 @@ public class CityTile : Tile, ICityIncome
     public Team Owner => isPlayer ? Team.Player : Team.Enemy;
     public int IncomePerTurn => productionAmount;
 
+    //Add City to list held in game manager
+    private void Start()
+    {
+        if (isPlayer)
+            GameManager.Instance.playerCities.Add(this);
+        else
+            GameManager.Instance.enemyCities.Add(this);
+    }
+
+    //Remove City from list held in game manager
+    private void OnDestroy()
+    {
+        if (isPlayer)
+            GameManager.Instance.playerCities.Remove(this);
+        else
+            GameManager.Instance.enemyCities.Remove(this);
+    }
+
     private void OnEnable()
     {
         GameManager.Instance?.RegisterIncomeTile(this);

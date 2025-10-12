@@ -5,8 +5,18 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
+
+    
+    
     public static GameManager Instance;
     public GameState GameState;
+
+    // Make a list of player cities/units
+    public List<CityTile> playerCities = new List<CityTile>();
+    public List<BaseUnit> playerUnits = new List<BaseUnit>();
+    // Make list of enemy cities/units
+    public List<CityTile> enemyCities = new List<CityTile>();
+    public List<BaseUnit> enemyUnits = new List<BaseUnit>();
 
     //end turn message
     [Header("UI References")]

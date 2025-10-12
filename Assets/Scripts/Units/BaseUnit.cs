@@ -29,8 +29,21 @@ public class BaseUnit : MonoBehaviour
         else Debug.LogError("HealthBar not assigned!");
 
         //TODO apply special faction modifiers
+        //Add Unit to list held in game manager
+        if (isPlayer)
+            GameManager.Instance.playerUnits.Add(this);
+        else
+            GameManager.Instance.enemyUnits.Add(this);
     }
 
+    //Remove Unit from list held in game manager
+    private void OnDestroy()
+    {
+        if (isPlayer)
+            GameManager.Instance.playerUnits.Remove(this);
+        else
+            GameManager.Instance.enemyUnits.Remove(this);
+    }
     //highlight all of a units valid tiles blue for within movement range and red for attackable
     public void HighlightValidTiles()
     {
