@@ -64,8 +64,10 @@ public class GameManager : MonoBehaviour
     // Pay income to whoever owns tiles; call this at start of each turn.
     public void PayoutTurnIncome()
     {
+        Debug.Log("[GM] Paying out turn income…");    
         foreach (var t in _incomeTiles)
         {
+            Debug.Log($"[GM] {t} pays {t.IncomePerTurn} to {t.Owner}");
             if (t.IncomePerTurn <= 0) continue;
             AddGold(t.Owner, t.IncomePerTurn);
         }
@@ -106,6 +108,8 @@ public class GameManager : MonoBehaviour
         _enemyGold  = enemyStartingGold;
 
         // Notify UI of starting gold
+        //Debug log
+        Debug.Log($"[GM] Start gold: P={_playerGold}, E={_enemyGold}");
         OnGoldChanged?.Invoke(Team.Player, _playerGold);
         OnGoldChanged?.Invoke(Team.Enemy,  _enemyGold);
         
@@ -131,6 +135,7 @@ public class GameManager : MonoBehaviour
                 UnitManager.Instance.SpawnFactions("examplePlayer", "exampleEnemy");
                 break;
             case GameState.PlayerTurn:
+                Debug.Log("[GM] -> PlayerTurn");
                 PayoutTurnIncome();
                 break;
             case GameState.EnemyTurn:
@@ -158,5 +163,6 @@ public interface ICityIncome
     Team Owner { get; }
     int IncomePerTurn { get; }
 }
+
 
 
