@@ -104,6 +104,11 @@ public class GameManager : MonoBehaviour
         // ===== ECONOMY: initialize wallets =====
         _playerGold = playerStartingGold;
         _enemyGold  = enemyStartingGold;
+
+        // Notify UI of starting gold
+        OnGoldChanged?.Invoke(Team.Player, _playerGold);
+        OnGoldChanged?.Invoke(Team.Enemy,  _enemyGold);
+        
     }
 
     //start on state generate Grid
@@ -126,6 +131,7 @@ public class GameManager : MonoBehaviour
                 UnitManager.Instance.SpawnFactions("examplePlayer", "exampleEnemy");
                 break;
             case GameState.PlayerTurn:
+                PayoutTurnIncome();
                 break;
             case GameState.EnemyTurn:
                 break;
@@ -152,4 +158,5 @@ public interface ICityIncome
     Team Owner { get; }
     int IncomePerTurn { get; }
 }
+
 
