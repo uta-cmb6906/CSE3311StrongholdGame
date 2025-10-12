@@ -7,7 +7,7 @@ public class BaseUnit : MonoBehaviour
 
     public Tile OccupiedTile;
     public bool isPlayer;
-    protected int maxHealth;
+    public int maxHealth;
     [SerializeField] protected int health;
     [SerializeField] protected int defense;
     [SerializeField] protected int movementRange;
@@ -137,11 +137,11 @@ public class BaseUnit : MonoBehaviour
     //increase all unit stats by 20%
     public void UpgradeUnit()
     {
-        maxHealth = (int) (maxHealth * 1.2f);
-        health = (int) (health * 1.2f);
-        defense = (int) (defense * 1.2f);
-        meleeDamage = (int) (meleeDamage * 1.2f);
-        rangedDamage = (int) (rangedDamage * 1.2f);
+        maxHealth = (int)(maxHealth * 1.2f);
+        health = (int)(health * 1.2f);
+        defense = (int)(defense * 1.2f);
+        meleeDamage = (int)(meleeDamage * 1.2f);
+        rangedDamage = (int)(rangedDamage * 1.2f);
     }
 
     private void UpdateHealthBar()

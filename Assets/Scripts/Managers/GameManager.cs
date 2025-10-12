@@ -1,11 +1,16 @@
 using System;
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public GameState GameState;
+
+    //end turn message
+    [Header("UI References")]
+    [SerializeField] private GameObject endTurnMessagePanel;
 
     public static event Action<GameState> OnGameStateChanged;
 
@@ -14,11 +19,11 @@ public class GameManager : MonoBehaviour
 
     [Header("Economy / Starting Gold")]
     [SerializeField] private int playerStartingGold = 200;
-    [SerializeField] private int enemyStartingGold  = 200;
+    [SerializeField] private int enemyStartingGold = 200;
 
     [Header("Economy / Costs")]
     public int CastleCost = 150;
-    public int HealCost   = 25;
+    public int HealCost = 25;
     public int UpgradeCost = 75;
 
     private int _playerGold;
@@ -64,7 +69,7 @@ public class GameManager : MonoBehaviour
     // Pay income to whoever owns tiles; call this at start of each turn.
     public void PayoutTurnIncome()
     {
-        Debug.Log("[GM] Paying out turn income…");    
+        Debug.Log("[GM] Paying out turn income…");
         foreach (var t in _incomeTiles)
         {
             Debug.Log($"[GM] {t} pays {t.IncomePerTurn} to {t.Owner}");
@@ -91,6 +96,20 @@ public class GameManager : MonoBehaviour
     }
     // ===== ECONOMY: END =====
 
+    public void EndPlayerTurn()
+    {
+        // if we are currently in the PlayerTurn state
+        if (GameState == GameState.PlayerTurn)
+        {
+            //show that my turn has ended gracefully :)
+            if (endTurnMessagePanel != null)
+            {
+                endTurnMessagePanel.SetActive(true);
+            }
+            ChangeState(GameState.EnemyTurn);
+        }
+    }
+
     //ensure all scenes are using the same instance of the manager
     void Awake()
     {
@@ -105,20 +124,26 @@ public class GameManager : MonoBehaviour
         }
         // ===== ECONOMY: initialize wallets =====
         _playerGold = playerStartingGold;
-        _enemyGold  = enemyStartingGold;
+        _enemyGold = enemyStartingGold;
+
+        //hidden endturn message
+        if (endTurnMessagePanel != null)
+        {
+            endTurnMessagePanel.SetActive(false);
+        }
 
         // Notify UI of starting gold
         //Debug log
         Debug.Log($"[GM] Start gold: P={_playerGold}, E={_enemyGold}");
         OnGoldChanged?.Invoke(Team.Player, _playerGold);
-        OnGoldChanged?.Invoke(Team.Enemy,  _enemyGold);
-        
+        OnGoldChanged?.Invoke(Team.Enemy, _enemyGold);
+
     }
 
     //start on state generate Grid
     void Start()
     {
-    //TODO eventually start at start menu
+        //TODO eventually start at start menu
         ChangeState(GameState.GenerateGrid);
     }
 
@@ -137,14 +162,34 @@ public class GameManager : MonoBehaviour
             case GameState.PlayerTurn:
                 Debug.Log("[GM] -> PlayerTurn");
                 PayoutTurnIncome();
+
+
                 break;
             case GameState.EnemyTurn:
+                Debug.Log("[GM] -> EnemyTurn");
+                StartCoroutine(WaitThenEndEnemyTurn(2.0f));
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
         }
 
         OnGameStateChanged?.Invoke(newState);
+    }
+
+    //enemy turn
+    private IEnumerator WaitThenEndEnemyTurn(float delay)
+    {
+        // Placeholder for AI work
+        yield return new WaitForSeconds(delay);
+
+        //hide message again after 2s
+        if (endTurnMessagePanel != null)
+        {
+            endTurnMessagePanel.SetActive(false);
+        }
+
+        // After delay, switch back to player turn, triggering PayoutTurnIncome() again
+        ChangeState(GameState.PlayerTurn);
     }
 }
 
