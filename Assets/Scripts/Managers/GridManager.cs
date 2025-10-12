@@ -20,6 +20,12 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Transform _cam;
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
 
+    private Camera GetCam()
+    {
+        if (_cam != null) return _cam.GetComponent<Camera>();
+        return Camera.main;
+    }
+    
     //ensure all scenes are using the same instance of the manager
     void Awake()
     {
@@ -31,7 +37,10 @@ public class GridManager : MonoBehaviour
         else if (Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        if (_cam == null && Camera.main != null)
+        _cam = Camera.main.transform;
     }
 
     public void GenerateGrid(string map)
@@ -142,5 +151,6 @@ public class GridManager : MonoBehaviour
     {
         return tiles.TryGetValue(pos, out var tile) ? tile : null;
     }
+
 
 }
