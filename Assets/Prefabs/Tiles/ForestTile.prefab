@@ -140,8 +140,9 @@ MonoBehaviour:
   _renderer: {fileID: 2873005680677763786}
   _terrainModifier: 1.25
   _isDeveloped: 0
-  x: 0
-  y: 0
+  isPlayer: 0
+  x: 1
+  y: 1
   _highlight: {fileID: 984069523715296731}
   _unitStationed: {fileID: 0}
 --- !u!212 &2873005680677763786

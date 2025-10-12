@@ -140,14 +140,12 @@ MonoBehaviour:
   _renderer: {fileID: 5855434157474022389}
   _terrainModifier: 1.5
   _isDeveloped: 1
-  x: 0
-  y: 0
+  isPlayer: 0
+  x: 8
+  y: 8
   _highlight: {fileID: 4878568258326108710}
   _unitStationed: {fileID: 0}
   productionAmount: 0
-  totalGoldPlayer: 0
-  totalGoldEnemy: 0
-  isPlayer: 0
 --- !u!212 &5855434157474022389
 SpriteRenderer:
   m_ObjectHideFlags: 0
