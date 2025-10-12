@@ -750,7 +750,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8250319649214860848, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1192868438}
   m_SourcePrefab: {fileID: 100100000, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
 --- !u!1 &916199521
 GameObject:
@@ -1110,6 +1113,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1134565905}
   m_CullTransparentMesh: 1
+--- !u!1 &1192868435 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8250319649214860848, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+  m_PrefabInstance: {fileID: 778107810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1192868438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1192868435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ea6608b286199340a848f2755dba31c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TileInfoDisplayManager
+  PanelTile: {fileID: 1484865092}
+  infoText: {fileID: 2014814278}
 --- !u!1 &1351936298
 GameObject:
   m_ObjectHideFlags: 0
@@ -1247,7 +1269,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1484865093
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1265,8 +1287,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 809.02, y: 382.78}
-  m_SizeDelta: {x: -1619, y: -765.551}
+  m_AnchoredPosition: {x: 778.8242, y: 381.34213}
+  m_SizeDelta: {x: -1558.6084, y: -762.6752}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1484865094
 MonoBehaviour:
@@ -1288,7 +1310,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -4184484094318694091, guid: f0c02ae487e712b459a20338c754bdee, type: 3}
+  m_Sprite: {fileID: 6218123344806412219, guid: bc7ebed21ac477348a4cdd745e248b87, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1735,8 +1757,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

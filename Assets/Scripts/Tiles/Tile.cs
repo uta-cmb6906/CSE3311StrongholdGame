@@ -89,7 +89,16 @@ public class Tile : MonoBehaviour
 
     public void DisplayTileInfo()
     {
-        ;
+        if (TileInfoDisplayManager.Instance.CurrentTile == this)
+        {
+            // If it is the active tile, hide the banner
+            TileInfoDisplayManager.Instance.HideInfo();
+        }
+        else
+        {
+            // If it's a new tile, display the info, 
+            TileInfoDisplayManager.Instance.DisplayInfo(TileInfo(), this);
+        }
     }
 
     //highlight the tile the specified color, and if force is true prevent OnMouseExit from removing highlight
@@ -114,11 +123,11 @@ public class Tile : MonoBehaviour
 
     void OnMouseEnter()
     {
-        if(!forceHighlight) HighlightTile(Color.white, false);
+        if (!forceHighlight) HighlightTile(Color.white, false);
     }
 
     void OnMouseExit()
     {
-        if(!forceHighlight) UnhighlightTile();
+        if (!forceHighlight) UnhighlightTile();
     }
 }
