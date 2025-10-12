@@ -14,8 +14,8 @@ public class ScriptableUnit : ScriptableObject
 
 public enum Team
 {
-    None,
     Player,
     Enemy
 
 }
+
