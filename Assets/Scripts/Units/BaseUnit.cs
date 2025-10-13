@@ -8,21 +8,28 @@ public class BaseUnit : MonoBehaviour
     public Tile OccupiedTile;
     public bool isPlayer;
     public int maxHealth;
+    [SerializeField] protected int cost;
     [SerializeField] protected int health;
     [SerializeField] protected int defense;
     [SerializeField] protected int movementRange;
     [SerializeField] protected int attackRange;
     [SerializeField] protected int meleeDamage;
     [SerializeField] protected int rangedDamage;
+    [SerializeField] protected bool actionPointRemaining = true;
 
     public Team OwnerTeam => isPlayer ? Team.Player : Team.Enemy; // converts isPlayer -> Team
 
+    public int Cost() => cost;
     public int Health() => health;
     public int Defense() => defense;
     public int MovementRange() => movementRange;
     public int AttackRange() => attackRange;
     public int MeleeDamage() => meleeDamage;
     public int RangedDamage() => rangedDamage;
+    public bool IsPlayer() => isPlayer;
+    public bool ActionpointRemaining() => actionPointRemaining;
+
+    public bool ResetAction() => actionPointRemaining = true;
 
     void Start()
     {
@@ -30,22 +37,20 @@ public class BaseUnit : MonoBehaviour
         if (HealthBar != null) HealthBar.fillAmount = 1f;
         else Debug.LogError("HealthBar not assigned!");
 
+        if (isPlayer && actionPointRemaining) OccupiedTile.HighlightTile(Color.yellow, true);
+
         //TODO apply special faction modifiers
-        //Add Unit to list held in game manager
-        if (isPlayer)
-            GameManager.Instance.playerUnits.Add(this);
-        else
-            GameManager.Instance.enemyUnits.Add(this);
     }
 
-    //Remove Unit from list held in game manager
+    /*//Remove Unit from list held in game manager
     private void OnDestroy()
     {
         if (isPlayer)
             GameManager.Instance.playerUnits.Remove(this);
         else
             GameManager.Instance.enemyUnits.Remove(this);
-    }
+    }*/
+
     //highlight all of a units valid tiles blue for within movement range and red for attackable
     public void HighlightValidTiles()
     {
@@ -92,6 +97,7 @@ public class BaseUnit : MonoBehaviour
     {
         if (!InRange(destination, movementRange)) return false;
         Move(destination);
+        GameManager.Instance.HighlightAvailableUnits();
         return true;
     }
 
@@ -101,13 +107,17 @@ public class BaseUnit : MonoBehaviour
         return (Mathf.Abs(OccupiedTile.X() - destination.X()) <= range && Mathf.Abs(OccupiedTile.Y() - destination.Y()) <= range);
     }
 
-    public void Move(Tile destination)
+    protected void Move(Tile destination)
     {
+        //remove available unit highlight
+        OccupiedTile.UnhighlightTile();
+
         UnhighlightValidTiles();
-        OccupiedTile._unitStationed = null;
+        OccupiedTile.ChangeStationed(null);
         OccupiedTile = destination;
-        OccupiedTile._unitStationed = this;
+        OccupiedTile.ChangeStationed(this);
         transform.position = OccupiedTile.transform.position;
+        actionPointRemaining = false;
     }
 
     //try to attack enemy returning true if successful or false if enemy out of range
@@ -118,8 +128,11 @@ public class BaseUnit : MonoBehaviour
         return true;
     }
 
-    public void Attack(BaseUnit enemy)
+    protected void Attack(BaseUnit enemy)
     {
+        //remove available unit highlight
+        OccupiedTile.UnhighlightTile();
+
         //enemy defense modified by its terrain bonus
         float enemyDefense = enemy.Defense() * enemy.OccupiedTile.TerrainModifier();
 
@@ -132,15 +145,25 @@ public class BaseUnit : MonoBehaviour
 
         //otherwise do ranged attack
         else enemy.TakeDamage(rangedDamage, enemyDefense);
+
+        actionPointRemaining = false;
+        GameManager.Instance.HighlightAvailableUnits();
     }
 
     //unit recieves specified damage modified by randomness and reduction. If its health is reduced to 0 it is destroyed
-    private void TakeDamage(float damage, float reduction)
+    protected void TakeDamage(float damage, float reduction)
     {
         float variation = Random.Range(.8f, 1.2f);
         health -= (int)(damage * variation * (100 - reduction) / 100);
         UpdateHealthBar();
-        if (health <= 0) Destroy(gameObject);
+        if (health <= 0)
+        {
+            //remove from GameManager's unit lists
+            if (isPlayer) GameManager.Instance.playerUnits.Remove(this);
+            else GameManager.Instance.enemyUnits.Remove(this);
+            
+            Destroy(gameObject);
+        } 
     }
 
     //restore unit health
@@ -160,7 +183,7 @@ public class BaseUnit : MonoBehaviour
         rangedDamage = (int)(rangedDamage * 1.2f);
     }
 
-    private void UpdateHealthBar()
+    protected void UpdateHealthBar()
     {
         HealthBar.fillAmount = (float)health / maxHealth;
     }
@@ -189,7 +212,6 @@ public class BaseUnit : MonoBehaviour
         }
 
         UpgradeUnit();
-        UpdateHealthBar();   // reflect new max/health
         return true;
     }
 
@@ -204,7 +226,6 @@ public class BaseUnit : MonoBehaviour
         }
 
         HealUnit();
-        UpdateHealthBar();
         return true;
     }
 }

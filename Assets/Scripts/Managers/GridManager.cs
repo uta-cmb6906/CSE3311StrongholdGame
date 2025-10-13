@@ -15,7 +15,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] private ForestTile forest;
     [SerializeField] private RiverTile river;
     [SerializeField] private MountainTile mountain;
-    [SerializeField] private CityTile userCity, enemyCity;
+    [SerializeField] private CityTile city;
     [SerializeField] private RallyPointTile rallyPoint;
     [SerializeField] private Transform _cam;
     private Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
@@ -65,7 +65,7 @@ public class GridManager : MonoBehaviour
             int x = int.Parse(tileData[0]);
             int y = int.Parse(tileData[1]);
             Tile tileType = null;
-            int isPlayer = 0;
+            bool isPlayer = false;
 
             //get prefab of specified tile type
             switch (tileData[2])
@@ -80,20 +80,18 @@ public class GridManager : MonoBehaviour
                     tileType = mountain;
                     break;
                 case "userCity":
-                    tileType = userCity;
-                    isPlayer = 2;
+                    tileType = city;
+                    isPlayer = true;
                     break;
                 case "enemyCity":
-                    tileType = enemyCity;
-                    isPlayer = 1;
+                    tileType = city;
                     break;
                 case "userRallyPoint":
                     tileType = rallyPoint;
-                    isPlayer = 2;
+                    isPlayer = true;
                     break;
                 case "enemyRallyPoint":
                     tileType = rallyPoint;
-                    isPlayer = 1;
                     break;
             }
 
@@ -109,35 +107,19 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < _height; y++)
             {
                 //if no tile at location make plains tile
-                if (GetTileAtPosition(new Vector2(x, y)) == null) CreateTile(x, y, plains, 0);
+                if (GetTileAtPosition(new Vector2(x, y)) == null) CreateTile(x, y, plains, false);
             }
         }
     }
 
     //create tile of specified terrain type add to dictionary
-    public void CreateTile(int x, int y, Tile tileType, int isPlayer)
+    public void CreateTile(int x, int y, Tile tileType, bool isPlayer)
     {
-        if (isPlayer == 0)
-        {
-            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
-            spawnedTile.SetCoords(x, y);
-            spawnedTile.name = $"Tile {x} {y}";
-            tiles[new Vector2(x, y)] = spawnedTile;
-        } else if(isPlayer == 1)
-        {
-            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
-            spawnedTile.isPlayer = false;
-            spawnedTile.SetCoords(x, y);
-            spawnedTile.name = $"Tile {x} {y}";
-            tiles[new Vector2(x, y)] = spawnedTile;
-        } else if(isPlayer == 2)
-        {
-            var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
-            spawnedTile.isPlayer = true;
-            spawnedTile.SetCoords(x, y);
-            spawnedTile.name = $"Tile {x} {y}";
-            tiles[new Vector2(x, y)] = spawnedTile;
-        }
+        var spawnedTile = Instantiate(tileType, new Vector3(x, y), Quaternion.identity);
+        spawnedTile.SetPlayer(isPlayer);
+        spawnedTile.SetCoords(x, y);
+        spawnedTile.name = $"Tile {x} {y}";
+        tiles[new Vector2(x, y)] = spawnedTile;
     }
 
     public void CenterCamera()

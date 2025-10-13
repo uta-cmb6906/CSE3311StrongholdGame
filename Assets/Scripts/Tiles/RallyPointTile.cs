@@ -3,37 +3,56 @@ using UnityEngine;
 
 public class RallyPointTile : Tile
 {
+    [SerializeField] private Sprite plainsTile;
+    [SerializeField] private Material plainsMaterial;
+    private SpriteRenderer spriteRenderer;
 
-    // Can be called from anywhere to give the location and owner of ralley point
-    public string RallyPointOwnerLoc()
+    protected override void Start()
     {
-        return this.x + " " + this.y + " " + isPlayer;
+        base.Start();
+
+        // Get the SpriteRenderer component
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        //use correct flag color
+        spriteRenderer.color = (isPlayer) ? Color.blue : Color.red;
+
+        //update stored rally points in GameManager
+        if (isPlayer) GameManager.Instance.playerRallyPoint = this;
+        else GameManager.Instance.enemyRallyPoint = this;
     }
-    public void DestroyTile()
+
+    //if new occupation unit is from other team convert rally point to plains tile
+    public override void ChangeStationed(BaseUnit newUnit)
     {
-        // Check if GridManager is initialized
-        if (GridManager.Instance == null)
-        {
-            Debug.LogWarning("GridManager instance not found. Cannot destroy tile.");
-            return;
-        }
+        _unitStationed = newUnit;
+        //if new unit not owner's unit
+        if (_unitStationed && _unitStationed.IsPlayer() != isPlayer) ConvertToPlains();
+    }
 
-        // Check if coordinates are valid within the grid
-        if (!GridManager.Instance.IsValidCoordinate(x, y))
-        {
-            Debug.LogWarning($"Invalid coordinates ({x}, {y}) when trying to destroy tile.");
-            return;
-        }
+    private void ConvertToPlains()
+    {
+        //remove from gamemanager
+        if (isPlayer) GameManager.Instance.playerRallyPoint = null;
+        else GameManager.Instance.enemyRallyPoint = null;
 
-        // Replace with plains tile 
-        GridManager.Instance.CreateTile(x, y, GridManager.Instance.plains, 0);
-
-        Destroy(gameObject);
-        }
+        //replicate plains attributes and visuals
+        _isDeveloped = false;
+        isPlayer = false;
+        spriteRenderer.sprite = plainsTile;
+        spriteRenderer.material = plainsMaterial;
+    }
 
     //clicking tile opens unit purchase interface (not implemented yet)
     public override string TileInfo()
     {
-        return "This tile is where new units will be spawned";
+        if (IsDeveloped())
+        {
+            return "This tile is where new units will be spawned";
+        }
+        else
+        {
+            return $"PlainsTile\n+ {_terrainModifier * 100 - 100}% Defense";
+        }
     }
 }

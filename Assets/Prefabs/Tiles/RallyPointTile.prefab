@@ -50,11 +50,13 @@ MonoBehaviour:
   _renderer: {fileID: 2636989528109562278}
   _terrainModifier: 1
   _isDeveloped: 1
-  isPlayer: 1
   x: 2
   y: 6
-  _highlight: {fileID: 7042459898348438484}
+  isPlayer: 0
   _unitStationed: {fileID: 0}
+  _highlight: {fileID: 7042459898348438484}
+  plainsTile: {fileID: 1870405292, guid: 97c1779e22bd07748ad2d7a14a3e3670, type: 3}
+  plainsMaterial: {fileID: -876546973899608171, guid: 9920c1f1781549a46ba081a2a15a16ec, type: 3}
 --- !u!212 &2636989528109562278
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -237,7 +239,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.02745098}
   m_FlipX: 0

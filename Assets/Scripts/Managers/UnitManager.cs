@@ -60,28 +60,20 @@ public class UnitManager : MonoBehaviour
                 continue;
             }
 
-            // Initial spawns are FREE (ignoreCost: true)
-            CreateUnit(su.UnitPrefab, spawnTile, ignoreCost: true, buyer: team, unitCost: su.GoldCost);
+            CreateUnit(su.UnitPrefab, spawnTile, team == Team.Player);
         }
     }
 
-    public bool CreateUnit(BaseUnit unit, Tile spawnTile, bool ignoreCost = false, Team buyer = Team.Player, int unitCost = 0)
+    public void CreateUnit(BaseUnit unit, Tile spawnTile, bool isPlayer)
     {
-        // ECONOMY: gate by gold unless this is an initial spawn
-        if (!ignoreCost)
-        {
-            if (!GameManager.Instance.TrySpendGold(buyer, unitCost))
-            {
-                Debug.Log($"[{buyer}] cannot afford unit (cost {unitCost}).");
-                return false;
-            }
-        }
-
         var spawnedUnit = Instantiate(unit);
-        spawnTile._unitStationed = spawnedUnit;
+        spawnTile.ChangeStationed(spawnedUnit);
         spawnedUnit.OccupiedTile = spawnTile;
         spawnedUnit.transform.position = spawnTile.transform.position;
-        return true;
+        
+        //update stored units in GameManager
+        if (isPlayer) GameManager.Instance.playerUnits.Add(spawnedUnit);
+        else GameManager.Instance.enemyUnits.Add(spawnedUnit);
     }
 
     public void SelectUnit(BaseUnit unit)

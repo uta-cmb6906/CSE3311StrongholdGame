@@ -78,7 +78,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.03529412}
   m_FlipX: 0
@@ -140,7 +140,6 @@ MonoBehaviour:
   _renderer: {fileID: 2873005680677763786}
   _terrainModifier: 1.25
   _isDeveloped: 0
-  isPlayer: 0
   x: 1
   y: 1
   _highlight: {fileID: 984069523715296731}

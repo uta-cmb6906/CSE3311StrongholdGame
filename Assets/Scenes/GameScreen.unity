@@ -1051,6 +1051,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: startingGold
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
       propertyPath: endTurnMessagePanel
       value: 
       objectReference: {fileID: 162329858}
@@ -1343,6 +1347,10 @@ PrefabInstance:
       propertyPath: _cam
       value: 
       objectReference: {fileID: 519420032}
+    - target: {fileID: 8211902525092227614, guid: b201189923e44fb4caaf8076e0a173b8, type: 3}
+      propertyPath: city
+      value: 
+      objectReference: {fileID: 7533243103090032177, guid: e85e3dd8e02de4649b407acfcb67c673, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

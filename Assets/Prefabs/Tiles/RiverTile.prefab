@@ -78,7 +78,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.043137256}
   m_FlipX: 0
@@ -118,7 +118,7 @@ Transform:
   m_GameObject: {fileID: 6074195611369618576}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.21, y: -6.98, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -140,7 +140,6 @@ MonoBehaviour:
   _renderer: {fileID: 2516771266612833702}
   _terrainModifier: 1.5
   _isDeveloped: 0
-  isPlayer: 0
   x: 7
   y: 7
   _highlight: {fileID: 3486842424418340440}

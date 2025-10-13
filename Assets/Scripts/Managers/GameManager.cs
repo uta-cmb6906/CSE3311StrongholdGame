@@ -5,9 +5,6 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-
-    
-    
     public static GameManager Instance;
     public GameState GameState;
 
@@ -17,6 +14,9 @@ public class GameManager : MonoBehaviour
     // Make list of enemy cities/units
     public List<CityTile> enemyCities = new List<CityTile>();
     public List<BaseUnit> enemyUnits = new List<BaseUnit>();
+    // Store Rally Points
+    public RallyPointTile playerRallyPoint;
+    public RallyPointTile enemyRallyPoint;
 
     //end turn message
     [Header("UI References")]
@@ -28,26 +28,32 @@ public class GameManager : MonoBehaviour
     public static event Action<Team, int> OnGoldChanged;  // (who, newGold)
 
     [Header("Economy / Starting Gold")]
-    [SerializeField] private int playerStartingGold = 200;
-    [SerializeField] private int enemyStartingGold = 200;
+    [SerializeField] private int startingGold;
 
     [Header("Economy / Costs")]
-    public int CastleCost = 150;
-    public int HealCost = 25;
-    public int UpgradeCost = 75;
+    [SerializeField] public int CastleCost = 150;
+    [SerializeField] public int HealCost = 25;
+    [SerializeField] public int UpgradeCost = 75;
 
-    private int _playerGold;
-    private int _enemyGold;
-
-    // city income tiles register here (optional but useful)
-    private readonly List<ICityIncome> _incomeTiles = new();
+    [SerializeField] private int _playerGold;
+    [SerializeField] private int _enemyGold;
 
     public int GetGold(Team who) => who == Team.Player ? _playerGold : _enemyGold;
 
-    public void AddGold(Team who, int amount)
+    private void InitializeGold()
     {
-        if (who == Team.Player) _playerGold += amount; else _enemyGold += amount;
-        OnGoldChanged?.Invoke(who, GetGold(who));
+        _playerGold = startingGold;
+        _enemyGold = startingGold;
+    }
+
+    private void AddPlayerTurnGold()
+    {
+        foreach (CityTile city in playerCities) _playerGold += city.Production();
+    }
+
+    private void AddEnemyTurnGold()
+    {
+        foreach (CityTile city in enemyCities) _enemyGold += city.Production();
     }
 
     public bool TrySpendGold(Team who, int cost)
@@ -69,23 +75,38 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Register/unregister per-turn income providers (city tiles)
-    public void RegisterIncomeTile(ICityIncome t)
+    //player tries to purchase a unit
+    public bool TryPurchaseUnit(BaseUnit unit)
     {
-        if (!_incomeTiles.Contains(t)) _incomeTiles.Add(t);
-    }
-    public void UnregisterIncomeTile(ICityIncome t) => _incomeTiles.Remove(t);
-
-    // Pay income to whoever owns tiles; call this at start of each turn.
-    public void PayoutTurnIncome()
-    {
-        Debug.Log("[GM] Paying out turn income…");
-        foreach (var t in _incomeTiles)
+        //rally point needs to exist
+        if (!playerRallyPoint)
         {
-            Debug.Log($"[GM] {t} pays {t.IncomePerTurn} to {t.Owner}");
-            if (t.IncomePerTurn <= 0) continue;
-            AddGold(t.Owner, t.IncomePerTurn);
+            //TODO error pop-up
+            return false;
         }
+
+        //rally point needs to be unoccupied
+        if (playerRallyPoint.IsOccupied())
+        {
+            //TODO error pop-up
+            return false;
+        }
+
+        //check if unit affordable
+        if (!TrySpendGold(Team.Player, unit.Cost()))
+        {
+            //TODO error pop-up
+            return false;
+        }
+
+        CreatePurchasedUnit(Team.Player, unit);
+        return true;
+    }
+    
+    private void CreatePurchasedUnit(Team team, BaseUnit unit)
+    {
+        if (team == Team.Player) UnitManager.Instance.CreateUnit(unit, playerRallyPoint, true);
+        else UnitManager.Instance.CreateUnit(unit, playerRallyPoint, false);
     }
 
     // Try to buy a castle on a given tile (prefab type kept generic)
@@ -93,7 +114,7 @@ public class GameManager : MonoBehaviour
     {
         if (tile == null || castlePrefab == null) return false;
         // basic buildability check: don't place where a unit already sits
-        if (tile._unitStationed != null) return false;
+        if (tile.GetStationedUnit() != null) return false;
 
         if (!TrySpendGold(buyer, CastleCost)) return false;
 
@@ -105,6 +126,23 @@ public class GameManager : MonoBehaviour
         return true;
     }
     // ===== ECONOMY: END =====
+    public void HighlightAvailableUnits()
+    {
+        foreach (BaseUnit unit in playerUnits)
+        {
+            if (unit.ActionpointRemaining()) unit.OccupiedTile.HighlightTile(Color.yellow, true);
+        } 
+    }
+
+    private void UnhighlightAvailableUnits()
+    {
+        foreach (BaseUnit unit in playerUnits) unit.OccupiedTile.UnhighlightTile();
+    }
+
+    private void ResetPlayerUnitActionPoints()
+    {
+        foreach (BaseUnit unit in playerUnits) unit.ResetAction();
+    }
 
     public void EndPlayerTurn()
     {
@@ -116,6 +154,8 @@ public class GameManager : MonoBehaviour
             {
                 endTurnMessagePanel.SetActive(true);
             }
+
+            UnhighlightAvailableUnits();
             ChangeState(GameState.EnemyTurn);
         }
     }
@@ -133,8 +173,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
         // ===== ECONOMY: initialize wallets =====
-        _playerGold = playerStartingGold;
-        _enemyGold = enemyStartingGold;
+        InitializeGold();
 
         //hidden endturn message
         if (endTurnMessagePanel != null)
@@ -171,12 +210,15 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.PlayerTurn:
                 Debug.Log("[GM] -> PlayerTurn");
-                PayoutTurnIncome();
+                AddPlayerTurnGold();
+                ResetPlayerUnitActionPoints();
+                HighlightAvailableUnits();
 
 
                 break;
             case GameState.EnemyTurn:
                 Debug.Log("[GM] -> EnemyTurn");
+                AddEnemyTurnGold();
                 StartCoroutine(WaitThenEndEnemyTurn(2.0f));
                 break;
             default:
@@ -210,13 +252,6 @@ public enum GameState
     PlayerTurn,
     EnemyTurn
 
-}
-
-// ===== ECONOMY: simple interface a city tile can implement =====
-public interface ICityIncome
-{
-    Team Owner { get; }
-    int IncomePerTurn { get; }
 }
 
 

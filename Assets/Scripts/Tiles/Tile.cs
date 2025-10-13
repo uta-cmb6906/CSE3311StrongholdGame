@@ -9,16 +9,16 @@ public class Tile : MonoBehaviour
 
     [SerializeField] protected float _terrainModifier;
     [SerializeField] protected bool _isDeveloped;
-    [SerializeField] public bool isPlayer;
     [SerializeField] protected int x;
     [SerializeField] protected int y;
+    [SerializeField] protected bool isPlayer;
+    [SerializeField] protected BaseUnit _unitStationed;
 
     [Header("Highlight Settings")]
     [SerializeField] private GameObject _highlight;
     private SpriteRenderer highlightRenderer;
     private bool forceHighlight = false;
 
-    public BaseUnit _unitStationed;
 
     public int X() => x;
     public int Y() => y;
@@ -26,6 +26,7 @@ public class Tile : MonoBehaviour
     public bool IsDeveloped() => _isDeveloped;
     public float TerrainModifier() => _terrainModifier;
     public BaseUnit GetStationedUnit() => _unitStationed;
+    public bool IsPlayer() => isPlayer;
 
     protected virtual void Start()
     {
@@ -63,7 +64,12 @@ public class Tile : MonoBehaviour
         this.y = y;
     }
 
-    public void ChangeStationed(BaseUnit newUnit)
+    public void SetPlayer(bool player)
+    {
+        isPlayer = player;
+    }
+
+    public virtual void ChangeStationed(BaseUnit newUnit)
     {
         _unitStationed = newUnit;
     }
@@ -79,7 +85,12 @@ public class Tile : MonoBehaviour
         {
             if (_unitStationed.isPlayer)
             {
-                UnitManager.Instance.SelectUnit(_unitStationed);
+                if (_unitStationed.ActionpointRemaining()) UnitManager.Instance.SelectUnit(_unitStationed);
+                else
+                {
+                    UnitManager.Instance.SelectUnit(null);
+                    DisplayTileInfo();
+                }
             }
             else if (currentlySelectedUnit != null)
             {
@@ -103,12 +114,14 @@ public class Tile : MonoBehaviour
         {
             DisplayTileInfo();
         }
+        
+        GameManager.Instance.HighlightAvailableUnits();
     }
 
     // ---------------- Tile Info Display ----------------
     public virtual string TileInfo()
     {
-        return $"{GetType().Name}\n+ {_terrainModifier}% Defense";
+        return $"{GetType().Name}\n+ {_terrainModifier * 100 - 100}% Defense";
     }
 
     public void DisplayTileInfo()
@@ -126,8 +139,7 @@ public class Tile : MonoBehaviour
     // ---------------- Highlight Logic ----------------
     public void HighlightTile(Color color, bool force)
     {
-        if (_highlight == null)
-            return;
+        if (_highlight == null) return;
 
         if (highlightRenderer != null)
         {
@@ -135,8 +147,7 @@ public class Tile : MonoBehaviour
             highlightRenderer.color = color;
         }
 
-        if (force)
-            forceHighlight = true;
+        if (force) forceHighlight = true;
 
         _highlight.SetActive(true);
     }
@@ -144,8 +155,7 @@ public class Tile : MonoBehaviour
     public void UnhighlightTile()
     {
         forceHighlight = false;
-        if (_highlight != null)
-            _highlight.SetActive(false);
+        if (_highlight != null) _highlight.SetActive(false);
     }
 
     // ---------------- Mouse Input ----------------
@@ -156,13 +166,11 @@ public class Tile : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        if (!forceHighlight)
-            HighlightTile(Color.white, false);
+        if (!forceHighlight) HighlightTile(Color.white, false);
     }
 
     private void OnMouseExit()
     {
-        if (!forceHighlight)
-            UnhighlightTile();
+        if (!forceHighlight) UnhighlightTile();
     }
 }
