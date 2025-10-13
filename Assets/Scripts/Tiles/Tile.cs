@@ -13,9 +13,11 @@ public class Tile : MonoBehaviour
     [SerializeField] protected int x;
     [SerializeField] protected int y;
 
+    [Header("Highlight Settings")]
     [SerializeField] private GameObject _highlight;
-    SpriteRenderer highlightRenderer;
+    private SpriteRenderer highlightRenderer;
     private bool forceHighlight = false;
+
     public BaseUnit _unitStationed;
 
     public int X() => x;
@@ -27,9 +29,34 @@ public class Tile : MonoBehaviour
 
     protected virtual void Start()
     {
-        highlightRenderer = _highlight.GetComponent<SpriteRenderer>();
+        TryInitHighlight();
     }
 
+    private void OnValidate()
+    {
+        // Helps auto-link the SpriteRenderer when editing prefabs
+        if (_highlight != null && highlightRenderer == null)
+            highlightRenderer = _highlight.GetComponent<SpriteRenderer>();
+    }
+
+    private void TryInitHighlight()
+    {
+        if (_highlight == null)
+        {
+            Debug.LogWarning($"[{name}] Tile._highlight is not assigned. Highlighting will be disabled.");
+            return;
+        }
+
+        highlightRenderer = _highlight.GetComponent<SpriteRenderer>();
+        if (highlightRenderer == null)
+        {
+            Debug.LogWarning($"[{name}] _highlight object has no SpriteRenderer. Color tinting won't work.");
+        }
+
+        _highlight.SetActive(false);
+    }
+
+    // ---------------- Core Logic ----------------
     public void SetCoords(int x, int y)
     {
         this.x = x;
@@ -43,93 +70,99 @@ public class Tile : MonoBehaviour
 
     private void EvaluateSelectedTile()
     {
-        //ignore if not player turn
-        if (GameManager.Instance.GameState != GameState.PlayerTurn) return;
+        if (GameManager.Instance.GameState != GameState.PlayerTurn)
+            return;
 
-        //get currently selected unit if any
         BaseUnit currentlySelectedUnit = UnitManager.Instance.SelectedUnit;
 
-        //if unit on tile
         if (IsOccupied())
         {
-            //if player unit on tile select it
-            if (_unitStationed.isPlayer) UnitManager.Instance.SelectUnit(_unitStationed);
-
-            //if tile has an enemy unit and player has already selcted a unit then initiate attack
+            if (_unitStationed.isPlayer)
+            {
+                UnitManager.Instance.SelectUnit(_unitStationed);
+            }
             else if (currentlySelectedUnit != null)
             {
                 var enemy = _unitStationed;
-
-                //if enemy unit out of range just display tile info
-                if (!currentlySelectedUnit.AttemptAttack(enemy)) DisplayTileInfo();
-
+                if (!currentlySelectedUnit.AttemptAttack(enemy))
+                    DisplayTileInfo();
                 UnitManager.Instance.SelectUnit(null);
             }
-
-            //if player has no selected unit just display tile info
-            else DisplayTileInfo();
+            else
+            {
+                DisplayTileInfo();
+            }
         }
-
-        //if empty tile and player has a selected unit then evaluate movement to tile
         else if (currentlySelectedUnit != null)
         {
-            //if tile outside of movement range just display tile info
-            if (!currentlySelectedUnit.AttemptMovement(this)) DisplayTileInfo();
-
+            if (!currentlySelectedUnit.AttemptMovement(this))
+                DisplayTileInfo();
             UnitManager.Instance.SelectUnit(null);
         }
-
-        else DisplayTileInfo();
+        else
+        {
+            DisplayTileInfo();
+        }
     }
 
+    // ---------------- Tile Info Display ----------------
     public virtual string TileInfo()
     {
-        return this.GetType().Name + "\n+ " + _terrainModifier + "% Defense";
+        return $"{GetType().Name}\n+ {_terrainModifier}% Defense";
     }
 
     public void DisplayTileInfo()
     {
         if (TileInfoDisplayManager.Instance.CurrentTile == this)
         {
-            // If it is the active tile, hide the banner
             TileInfoDisplayManager.Instance.HideInfo();
         }
         else
         {
-            // If it's a new tile, display the info, 
             TileInfoDisplayManager.Instance.DisplayInfo(TileInfo(), this);
         }
     }
 
-    //highlight the tile the specified color, and if force is true prevent OnMouseExit from removing highlight
+    // ---------------- Highlight Logic ----------------
     public void HighlightTile(Color color, bool force)
     {
-        color.a = .25f;
-        highlightRenderer.color = color;
-        if (force) forceHighlight = true;
+        if (_highlight == null)
+            return;
+
+        if (highlightRenderer != null)
+        {
+            color.a = 0.25f;
+            highlightRenderer.color = color;
+        }
+
+        if (force)
+            forceHighlight = true;
+
         _highlight.SetActive(true);
     }
 
     public void UnhighlightTile()
     {
         forceHighlight = false;
-        _highlight.SetActive(false);
+        if (_highlight != null)
+            _highlight.SetActive(false);
     }
 
-    void OnMouseDown()
+    // ---------------- Mouse Input ----------------
+    private void OnMouseDown()
     {
         EvaluateSelectedTile();
     }
 
-    void OnMouseEnter()
+    private void OnMouseEnter()
     {
-        if (!forceHighlight) HighlightTile(Color.white, false);
+        if (!forceHighlight)
+            HighlightTile(Color.white, false);
     }
 
-    void OnMouseExit()
+    private void OnMouseExit()
     {
-        if (!forceHighlight) UnhighlightTile();
+        if (!forceHighlight)
+            UnhighlightTile();
     }
-
-
 }
