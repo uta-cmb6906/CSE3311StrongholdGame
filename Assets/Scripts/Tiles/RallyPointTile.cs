@@ -3,9 +3,15 @@ using UnityEngine;
 
 public class RallyPointTile : Tile
 {
+    [Header("Plains Tiles")]
     [SerializeField] private Sprite plainsTile;
     [SerializeField] private Material plainsMaterial;
     private SpriteRenderer spriteRenderer;
+
+    [Header("Rally Point Sprites")]
+    [SerializeField] private Sprite playerRallyPoint;
+
+    [SerializeField] private Sprite enemyRallyPoint;
 
     protected override void Start()
     {
@@ -15,7 +21,7 @@ public class RallyPointTile : Tile
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         //use correct flag color
-        spriteRenderer.color = (isPlayer) ? Color.blue : Color.red;
+        spriteRenderer.sprite = (isPlayer) ? playerRallyPoint : enemyRallyPoint;
 
         //update stored rally points in GameManager
         if (isPlayer) GameManager.Instance.playerRallyPoint = this;

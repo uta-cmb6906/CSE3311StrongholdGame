@@ -5,6 +5,7 @@ public class CityTile : Tile
 {
     private int production = 10;
 
+    [Header("Cities Sprites")]
     [SerializeField] private Sprite playerCity;
     [SerializeField] private Sprite enemyCity;
 

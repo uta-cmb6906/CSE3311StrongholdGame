@@ -52,8 +52,9 @@ MonoBehaviour:
   _isDeveloped: 1
   x: 0
   y: 0
-  _highlight: {fileID: 5492748974089271150}
+  isPlayer: 0
   _unitStationed: {fileID: 0}
+  _highlight: {fileID: 5492748974089271150}
   playerCity: {fileID: -909268389699053690, guid: f425cbcd9b1e64291ab42ea2e3326363, type: 3}
   enemyCity: {fileID: -7727881055261032411, guid: 020cd3e257b7e429a84b42422990efdd, type: 3}
 --- !u!212 &7410611003398220065
@@ -81,7 +82,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: -876546973899608171, guid: 9920c1f1781549a46ba081a2a15a16ec, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
