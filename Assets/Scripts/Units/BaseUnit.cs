@@ -15,6 +15,8 @@ public class BaseUnit : MonoBehaviour
     [SerializeField] protected int meleeDamage;
     [SerializeField] protected int rangedDamage;
 
+    public Team OwnerTeam => isPlayer ? Team.Player : Team.Enemy; // converts isPlayer -> Team
+
     public int Health() => health;
     public int Defense() => defense;
     public int MovementRange() => movementRange;
@@ -145,6 +147,7 @@ public class BaseUnit : MonoBehaviour
     public void HealUnit()
     {
         health = maxHealth;
+        UpdateHealthBar();
     }
 
     //increase all unit stats by 20%
@@ -172,4 +175,37 @@ public class BaseUnit : MonoBehaviour
             + "\n+ " + meleeDamage + " Melee Damage"
             + "\n+ " + rangedDamage + " Ranged Damage";
     }
+
+
+    public bool TryUpgradeWithGold()
+    {
+        var gm = GameManager.Instance;
+
+        // spend from the correct wallet based on isPlayer
+        if (!gm.TrySpendGold(OwnerTeam, gm.UpgradeCost))
+        {
+            Debug.Log($"[{OwnerTeam}] Not enough gold to upgrade (cost {gm.UpgradeCost}).");
+            return false;
+        }
+
+        UpgradeUnit();
+        UpdateHealthBar();   // reflect new max/health
+        return true;
+    }
+
+    public bool TryHealWithGold()
+    {
+        var gm = GameManager.Instance;
+
+        if (!gm.TrySpendGold(OwnerTeam, gm.HealCost))
+        {
+            Debug.Log($"[{OwnerTeam}] Not enough gold to heal (cost {gm.HealCost}).");
+            return false;
+        }
+
+        HealUnit();
+        UpdateHealthBar();
+        return true;
+    }
 }
+
