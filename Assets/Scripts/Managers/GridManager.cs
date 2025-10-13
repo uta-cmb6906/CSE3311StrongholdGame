@@ -152,5 +152,11 @@ public class GridManager : MonoBehaviour
         return tiles.TryGetValue(pos, out var tile) ? tile : null;
     }
 
-
+    public bool IsValidCoordinate(int x, int y)
+    {
+        if (x < _width && y < _height)
+            return true;
+        else
+            return false;
+    }
 }
