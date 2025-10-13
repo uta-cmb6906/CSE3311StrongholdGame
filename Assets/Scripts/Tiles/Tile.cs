@@ -25,7 +25,7 @@ public class Tile : MonoBehaviour
     public float TerrainModifier() => _terrainModifier;
     public BaseUnit GetStationedUnit() => _unitStationed;
 
-    void Start()
+    protected virtual void Start()
     {
         highlightRenderer = _highlight.GetComponent<SpriteRenderer>();
     }
