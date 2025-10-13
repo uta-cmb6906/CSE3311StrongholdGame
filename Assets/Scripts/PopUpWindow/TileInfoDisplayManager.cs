@@ -64,4 +64,58 @@ public class TileInfoDisplayManager : MonoBehaviour
             PanelTile.SetActive(false);
         }
     }
+
+    public void OnUpgradeButton()
+    {
+        var unit = UnitManager.Instance.SelectedUnit;
+        if (unit == null)
+        {
+            Debug.Log("[UI] No unit selected to upgrade.");
+            return;
+        }
+
+        if (!unit.isPlayer)
+        {
+            Debug.Log("[UI] Cannot upgrade enemy units.");
+            return;
+        }
+
+        if (unit.TryUpgradeWithGold())
+        {
+            Debug.Log("[UI] Upgrade successful.");
+            // refresh UI text so the panel shows new stats
+            DisplayInfo(unit.UnitInfo(), unit.OccupiedTile);
+        }
+        else
+        {
+            Debug.Log("[UI] Not enough gold to upgrade.");
+        }
+    }
+
+    // Called by the Heal Button (hook this in OnClick)
+    public void OnHealButton()
+    {
+        var unit = UnitManager.Instance.SelectedUnit;
+        if (unit == null)
+        {
+            Debug.Log("[UI] No unit selected to heal.");
+            return;
+        }
+
+        if (!unit.isPlayer)
+        {
+            Debug.Log("[UI] Cannot heal enemy units.");
+            return;
+        }
+
+        if (unit.TryHealWithGold())
+        {
+            Debug.Log("[UI] Heal successful.");
+            DisplayInfo(unit.UnitInfo(), unit.OccupiedTile);
+        }
+        else
+        {
+            Debug.Log("[UI] Not enough gold to heal.");
+        }
+    }
 }
