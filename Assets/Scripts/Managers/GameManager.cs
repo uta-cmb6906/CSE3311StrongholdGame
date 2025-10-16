@@ -22,6 +22,10 @@ public class GameManager : MonoBehaviour
     [Header("UI References")]
     [SerializeField] private GameObject endTurnMessagePanel;
 
+    //end turn message
+    [Header("Difficulty")]
+    [SerializeField] public int difficulty;
+
     public static event Action<GameState> OnGameStateChanged;
 
     // ===== ECONOMY: BEGIN =====

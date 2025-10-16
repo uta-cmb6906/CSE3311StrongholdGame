@@ -1051,6 +1051,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: difficulty
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
       propertyPath: startingGold
       value: 200
       objectReference: {fileID: 0}

@@ -70,6 +70,10 @@ public class UnitManager : MonoBehaviour
         spawnTile.ChangeStationed(spawnedUnit);
         spawnedUnit.OccupiedTile = spawnTile;
         spawnedUnit.transform.position = spawnTile.transform.position;
+
+        //adjust for difficulty
+        if (GameManager.Instance.difficulty == -1 && isPlayer) spawnedUnit.UpgradeUnit();
+        if (GameManager.Instance.difficulty == 1 && !isPlayer) spawnedUnit.UpgradeUnit();
         
         //update stored units in GameManager
         if (isPlayer) GameManager.Instance.playerUnits.Add(spawnedUnit);
