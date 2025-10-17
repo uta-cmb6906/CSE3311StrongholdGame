@@ -6,11 +6,11 @@ public class UnitStat : MonoBehaviour
 {
     // Assign your Text or TextMeshProUGUI component in the Inspector
     [SerializeField] private TextMeshProUGUI unitInfoText;
-    // OR [SerializeField] private Text unitInfoText;
+
 
     void Start()
     {
-        // Optional: clear the text on start
+        //clear the text on start
         if (unitInfoText == null)
         {
             Debug.LogError("Unit Info Text component is not assigned in UnitStat.cs!");
@@ -29,15 +29,15 @@ public class UnitStat : MonoBehaviour
     {
         if (unit != null)
         {
-            // Unit is selected: show the panel and update text
+            // Unit is selected
             gameObject.SetActive(true);
 
-            // Assuming your BaseUnit.UnitInfo() method returns a nicely formatted string
+
             unitInfoText.text = unit.UnitInfo();
         }
         else
         {
-            // Unit is deselected: hide the panel and clear text
+            // Unit is deselected
             gameObject.SetActive(false);
             unitInfoText.text = "";
         }
