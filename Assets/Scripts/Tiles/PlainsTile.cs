@@ -18,6 +18,13 @@ public class PlainsTile : Tile
         RandomizeSprite();
     }
 
+    public override string TileInfo()
+    {
+        GameManager.Instance.selectedPlainsTile = this;
+        
+        return base.TileInfo() + $"\n\nCastle Button\nWill Build Here";
+    }
+
     public void RandomizeSprite()
     {
         // Use the cached local reference

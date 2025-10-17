@@ -169,18 +169,28 @@ public class BaseUnit : MonoBehaviour
     //restore unit health
     public void HealUnit()
     {
+        //remove available unit highlight
+        OccupiedTile.UnhighlightTile();
+
         health = maxHealth;
         UpdateHealthBar();
+
+        actionPointRemaining = false;
     }
 
     //increase all unit stats by 20%
     public void UpgradeUnit()
     {
+        //remove available unit highlight
+        OccupiedTile.UnhighlightTile();
+
         maxHealth = (int)(maxHealth * 1.2f);
         health = (int)(health * 1.2f);
         defense = (int)(defense * 1.2f);
         meleeDamage = (int)(meleeDamage * 1.2f);
         rangedDamage = (int)(rangedDamage * 1.2f);
+
+        actionPointRemaining = false;
     }
 
     protected void UpdateHealthBar()
@@ -197,36 +207,6 @@ public class BaseUnit : MonoBehaviour
             + "\n+ " + attackRange + " Attack Range"
             + "\n+ " + meleeDamage + " Melee Damage"
             + "\n+ " + rangedDamage + " Ranged Damage";
-    }
-
-
-    public bool TryUpgradeWithGold()
-    {
-        var gm = GameManager.Instance;
-
-        // spend from the correct wallet based on isPlayer
-        if (!gm.TrySpendGold(OwnerTeam, gm.UpgradeCost))
-        {
-            Debug.Log($"[{OwnerTeam}] Not enough gold to upgrade (cost {gm.UpgradeCost}).");
-            return false;
-        }
-
-        UpgradeUnit();
-        return true;
-    }
-
-    public bool TryHealWithGold()
-    {
-        var gm = GameManager.Instance;
-
-        if (!gm.TrySpendGold(OwnerTeam, gm.HealCost))
-        {
-            Debug.Log($"[{OwnerTeam}] Not enough gold to heal (cost {gm.HealCost}).");
-            return false;
-        }
-
-        HealUnit();
-        return true;
     }
 }
 

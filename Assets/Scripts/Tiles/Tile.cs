@@ -79,6 +79,7 @@ public class Tile : MonoBehaviour
         if (GameManager.Instance.GameState != GameState.PlayerTurn)
             return;
 
+        GameManager.Instance.selectedPlainsTile = null;
         BaseUnit currentlySelectedUnit = UnitManager.Instance.SelectedUnit;
 
         if (IsOccupied())

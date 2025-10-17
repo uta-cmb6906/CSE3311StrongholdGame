@@ -17,6 +17,13 @@ public class GameManager : MonoBehaviour
     // Store Rally Points
     public RallyPointTile playerRallyPoint;
     public RallyPointTile enemyRallyPoint;
+    
+    // Store selected plains tile
+    public PlainsTile selectedPlainsTile;
+
+    //needed prefabs
+    [Header("Necessary PreFabs")]
+    [SerializeField] private BaseUnit playerCastle;
 
     //end turn message
     [Header("UI References")]
@@ -53,6 +60,7 @@ public class GameManager : MonoBehaviour
     private void AddPlayerTurnGold()
     {
         foreach (CityTile city in playerCities) _playerGold += city.Production();
+        OnGoldChanged?.Invoke(Team.Player, _playerGold);
     }
 
     private void AddEnemyTurnGold()
@@ -106,6 +114,52 @@ public class GameManager : MonoBehaviour
         CreatePurchasedUnit(Team.Player, unit);
         return true;
     }
+
+    public bool TryUpgrade()
+    {
+        //if not player turn ignore
+        if (GameState != GameState.PlayerTurn) return false;
+
+        //check if unit selected
+        BaseUnit currentlySelectedUnit = UnitManager.Instance.SelectedUnit;
+        if (!currentlySelectedUnit) return false;
+
+        // spend from the correct wallet based on isPlayer
+        if (!TrySpendGold(Team.Player, UpgradeCost))
+        {
+            Debug.Log($"Not enough gold to upgrade (cost {UpgradeCost}).");
+            return false;
+        }
+
+        //upgrade unit and rehighlight available units
+        currentlySelectedUnit.UpgradeUnit();
+        UnitManager.Instance.SelectUnit(null);
+        HighlightAvailableUnits();
+        return true;
+    }
+
+    public bool TryHeal()
+    {
+        //if not player turn ignore
+        if (GameState != GameState.PlayerTurn) return false;
+
+        //check if unit selected
+        BaseUnit currentlySelectedUnit = UnitManager.Instance.SelectedUnit;
+        if (!currentlySelectedUnit) return false;
+
+        // spend from the correct wallet based on isPlayer
+        if (!TrySpendGold(Team.Player, HealCost))
+        {
+            Debug.Log($"Not enough gold to heal (cost {HealCost}).");
+            return false;
+        }
+
+        //upgrade unit and rehighlight available units
+        currentlySelectedUnit.HealUnit();
+        UnitManager.Instance.SelectUnit(null);
+        HighlightAvailableUnits();
+        return true;
+    }
     
     private void CreatePurchasedUnit(Team team, BaseUnit unit)
     {
@@ -114,19 +168,24 @@ public class GameManager : MonoBehaviour
     }
 
     // Try to buy a castle on a given tile (prefab type kept generic)
-    public bool TryBuyCastle(Team buyer, GameObject castlePrefab, Tile tile, Transform parent = null)
+    public bool TryBuyCastle()
     {
-        if (tile == null || castlePrefab == null) return false;
-        // basic buildability check: don't place where a unit already sits
-        if (tile.GetStationedUnit() != null) return false;
+        //if not player turn ignore
+        if (GameState != GameState.PlayerTurn) return false;
 
-        if (!TrySpendGold(buyer, CastleCost)) return false;
+        //check if plains tile selected and unoccupied
+        if (!selectedPlainsTile || selectedPlainsTile.IsOccupied()) return false;
 
-        var go = Instantiate(castlePrefab, tile.transform.position, Quaternion.identity, parent);
-        // If your castle is a BaseUnit, you *may* want to mark it on the tile:
-        // var baseUnit = go.GetComponent<BaseUnit>();
-        // if (baseUnit != null) { tile._unitStationed = baseUnit; baseUnit.OccupiedTile = tile; }
+        // spend from the correct wallet based on isPlayer
+        if (!TrySpendGold(Team.Player, CastleCost))
+        {
+            Debug.Log($"Not enough gold to build castle (cost {CastleCost}).");
+            return false;
+        }
 
+        //build castle
+        UnitManager.Instance.CreateUnit(playerCastle, selectedPlainsTile, true);
+        HighlightAvailableUnits();
         return true;
     }
     // ===== ECONOMY: END =====

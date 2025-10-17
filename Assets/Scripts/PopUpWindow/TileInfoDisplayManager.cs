@@ -80,7 +80,7 @@ public class TileInfoDisplayManager : MonoBehaviour
             return;
         }
 
-        if (unit.TryUpgradeWithGold())
+        if (GameManager.Instance.TryUpgrade())
         {
             Debug.Log("[UI] Upgrade successful.");
             // refresh UI text so the panel shows new stats
@@ -108,7 +108,7 @@ public class TileInfoDisplayManager : MonoBehaviour
             return;
         }
 
-        if (unit.TryHealWithGold())
+        if (GameManager.Instance.TryHeal())
         {
             Debug.Log("[UI] Heal successful.");
             DisplayInfo(unit.UnitInfo(), unit.OccupiedTile);
