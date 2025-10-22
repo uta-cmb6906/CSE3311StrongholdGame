@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    public static string MapToLoad = "MapData";
     public GameState GameState;
 
     // Make a list of player cities/units
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviour
     // Store Rally Points
     public RallyPointTile playerRallyPoint;
     public RallyPointTile enemyRallyPoint;
-    
+
     // Store selected plains tile
     public PlainsTile selectedPlainsTile;
 
@@ -160,7 +161,7 @@ public class GameManager : MonoBehaviour
         HighlightAvailableUnits();
         return true;
     }
-    
+
     private void CreatePurchasedUnit(Team team, BaseUnit unit)
     {
         if (team == Team.Player) UnitManager.Instance.CreateUnit(unit, playerRallyPoint, true);
@@ -194,7 +195,7 @@ public class GameManager : MonoBehaviour
         foreach (BaseUnit unit in playerUnits)
         {
             if (unit.ActionpointRemaining()) unit.OccupiedTile.HighlightTile(Color.yellow, true);
-        } 
+        }
     }
 
     private void UnhighlightAvailableUnits()
@@ -266,7 +267,7 @@ public class GameManager : MonoBehaviour
         switch (newState)
         {
             case GameState.GenerateGrid:
-                GridManager.Instance.GenerateGrid("MapData");
+                GridManager.Instance.GenerateGrid(MapToLoad);
                 break;
             case GameState.SpawnFactions:
                 UnitManager.Instance.SpawnFactions("examplePlayer", "exampleEnemy");

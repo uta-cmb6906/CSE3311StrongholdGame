@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static GameManager;
 
 public class MainMenu : MonoBehaviour
 {
@@ -47,9 +48,28 @@ public class MainMenu : MonoBehaviour
     }
 
     // all the difficulty settings logic will implement it later
+
+    // Implemented :)
     public void SetDifficulty(string difficultyLevel)
     {
         Debug.Log("Difficulty is set to " + difficultyLevel);
+
+        switch (difficultyLevel)
+        {
+            case "Easy":
+                MapToLoad = "MapData1";
+                break;
+            case "Medium":
+                MapToLoad = "MapData2";
+                break;
+            case "Hard":
+                MapToLoad = "MapData3";
+                break;
+            default:
+                MapToLoad = "MapData";
+                break;
+        }
+        Debug.Log($"Map set to load: {MapToLoad}.csv");
         CloseDifficultySettings();
     }
 }
