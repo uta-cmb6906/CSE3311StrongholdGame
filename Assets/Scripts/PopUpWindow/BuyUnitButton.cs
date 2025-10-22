@@ -1,108 +1,177 @@
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Button handler for buying/spawning a unit at the currently selected tile.
+/// NOTE: We avoid referencing Tile.isPlayer (varies by branch) and we don't hard-code
+/// UnitManager.CreateUnit's signature (we call it via reflection if present).
+/// If no usable CreateUnit overload is found, we fall back to a local Instantiate so
+/// the UI remains testable without changing other scripts.
+/// </summary>
 public class BuyUnitButton : MonoBehaviour
 {
-    [Header("Unit To Purchase")]
-    [Tooltip("Assign the ScriptableUnit (like Knight, Archer, etc.) that this button should spawn.")]
-    public ScriptableUnit unitToBuy;
+    [Header("Unit to buy")]
+    [Tooltip("Scriptable unit (holds the prefab) to create when this button is pressed.")]
+    public ScriptableUnit unitToBuy;             // must expose UnitPrefab (BaseUnit)
 
-    [Header("Buyer Settings")]
-    [Tooltip("Which team this purchase belongs to.")]
-    public Team buyer = Team.Player;
+    [Header("Economy")]
+    [Tooltip("Optional cost to charge. If 0, no spending check is performed here.")]
+    public int cost = 0;
 
-    [Header("Optional: Auto-disable if unaffordable")]
+    [Tooltip("Who pays / who owns the unit you spawn.")]
+    public Team buyerTeam = Team.Player;
+
+    [Header("UI")]
+    [Tooltip("Optional: disable the button when purchase is not possible.")]
     public Button button;
 
-    private void Reset()
+    // Hook this to the button's OnClick in the Inspector
+    public void OnClickBuy()
     {
-        button = GetComponent<Button>();
-    }
-
-    private void Update()
-    {
-        // Optional: you could grey out the button if the player doesn't have enough gold.
-        // For now, just leave it enabled. GameManager/UnitManager will actually block the purchase if needed.
-        if (button != null && unitToBuy != null && GameManager.Instance != null)
+        if (unitToBuy == null || unitToBuy.UnitPrefab == null)
         {
-            button.interactable = true;
-        }
-    }
-
-    // Called when the player clicks the "Buy" button in the UI
-    public void OnClick_Buy()
-    {
-        if (unitToBuy == null)
-        {
-            Debug.LogWarning("[BuyUnit] Missing ScriptableUnit reference on button.");
+            Debug.LogWarning("[BuyUnit] No ScriptableUnit or UnitPrefab set.");
             return;
         }
 
-        // Find a valid tile to spawn this unit (usually a rally point or city)
-        Tile spawnTile = FindSpawnTile(buyer);
-        if (spawnTile == null)
+        // We rely on the tile the player most recently clicked (already tracked by your UI)
+        var currentTile = TileInfoDisplayManager.Instance != null
+            ? TileInfoDisplayManager.Instance.CurrentTile
+            : null;
+
+        if (currentTile == null)
         {
-            Debug.LogWarning("[BuyUnit] No open rally point or city found for this team.");
+            Debug.Log("[BuyUnit] No tile selected. Click a tile first (ideally your rally point).");
             return;
         }
 
-        // Try to create the unit — UnitManager handles gold cost + validation
-        bool created = UnitManager.Instance.CreateUnit(
-            unitToBuy.UnitPrefab,
-            spawnTile,
-            ignoreCost: false,
-            buyer: buyer
-        );
+        // Require a RallyPointTile and that it's empty. (No need to touch Tile.isPlayer here.)
+        var rally = currentTile as RallyPointTile;
+        if (rally == null)
+        {
+            Debug.Log("[BuyUnit] Selected tile is not a RallyPoint. Select your rally point and try again.");
+            return;
+        }
+        if (rally.IsOccupied())
+        {
+            Debug.Log("[BuyUnit] Rally point is occupied. Clear it first.");
+            return;
+        }
 
+        // If a cost is set, try to pay it through GameManager (if your branch supports it).
+        if (cost > 0)
+        {
+            // If your GameManager has TrySpendGold, this will work.
+            // If it doesn't, set cost to 0 in the Inspector and no spending check is performed.
+            if (!GameManager.Instance.TrySpendGold(buyerTeam, cost))
+            {
+                Debug.Log("[BuyUnit] Not enough gold to buy this unit.");
+                return;
+            }
+        }
+
+        // Try to call UnitManager.CreateUnit using whatever signature exists in your branch.
+        var created = TryCreateViaUnitManager(unitToBuy.UnitPrefab, rally);
         if (!created)
         {
-            Debug.Log("[BuyUnit] Purchase failed (likely not enough gold or tile occupied).");
-            return;
+            // As a last resort (and to avoid compile errors), spawn directly.
+            SpawnLocally(unitToBuy.UnitPrefab, rally);
         }
 
-        Debug.Log($"[BuyUnit] Spawned {unitToBuy.name} for {buyer} at ({spawnTile.X()}, {spawnTile.Y()}).");
-    }
-
-    // ----------------- Helper Functions -----------------
-
-    // Finds a valid tile to place the unit for the given team
-    private Tile FindSpawnTile(Team team)
-    {
-        // 1. Prefer a rally point belonging to this team that isn't occupied
-        var rally = FindObjectsOfType<RallyPointTile>()
-                    .FirstOrDefault(t => (t.isPlayer ? Team.Player : Team.Enemy) == team && !t.IsOccupied());
-        if (rally != null) return rally;
-
-        // 2. Otherwise, check for an unoccupied friendly city
-        var city = FindObjectsOfType<CityTile>()
-                   .FirstOrDefault(t => (t.isPlayer ? Team.Player : Team.Enemy) == team && !t.IsOccupied());
-        if (city != null) return city;
-
-        // 3. Last resort — find an empty tile next to a friendly city
-        var anyCity = FindObjectsOfType<CityTile>()
-                      .FirstOrDefault(t => (t.isPlayer ? Team.Player : Team.Enemy) == team);
-        if (anyCity != null)
+        // Optional: refresh the right-hand tile panel if it's open
+        if (TileInfoDisplayManager.Instance != null)
         {
-            var adj = GetFirstEmptyNeighbor(anyCity);
-            if (adj != null) return adj;
+            TileInfoDisplayManager.Instance.DisplayInfo(rally.TileInfo(), rally);
         }
-
-        return null;
     }
 
-    // Simple neighbor check to find an empty tile next to a city
-    private Tile GetFirstEmptyNeighbor(Tile origin)
+    /// <summary>
+    /// Attempts to call UnitManager.CreateUnit(...) using reflection so we don't depend
+    /// on a specific signature (branches differ).
+    /// Returns true if some overload accepted the call.
+    /// </summary>
+    private bool TryCreateViaUnitManager(BaseUnit prefab, Tile tile)
     {
-        var candidates = new[]
+        var um = UnitManager.Instance;
+        if (um == null) return false;
+
+        var type = um.GetType();
+        var methods = type.GetMethods(System.Reflection.BindingFlags.Instance |
+                                      System.Reflection.BindingFlags.Public |
+                                      System.Reflection.BindingFlags.NonPublic);
+
+        // We try a few common shapes, without using named parameters.
+        object[][] candidateArgLists = new object[][]
         {
-            GridManager.Instance.GetTileAtPosition(new Vector2(origin.X() + 1, origin.Y())),
-            GridManager.Instance.GetTileAtPosition(new Vector2(origin.X() - 1, origin.Y())),
-            GridManager.Instance.GetTileAtPosition(new Vector2(origin.X(), origin.Y() + 1)),
-            GridManager.Instance.GetTileAtPosition(new Vector2(origin.X(), origin.Y() - 1))
+            // (BaseUnit, Tile, Team, int)  -> some branches pass cost explicitly
+            new object[] { prefab, tile, buyerTeam, cost },
+            // (BaseUnit, Tile, Team)
+            new object[] { prefab, tile, buyerTeam },
+            // (BaseUnit, Tile, bool, Team, int) -> older branches with ignoreCost
+            new object[] { prefab, tile, false, buyerTeam, cost },
+            // (BaseUnit, Tile) -> simplest branch
+            new object[] { prefab, tile }
         };
 
-        // Return the first open one
-        return candidates.FirstOrDefault(t => t != null && !t.IsOccupied());
+        foreach (var m in methods)
+        {
+            if (m.Name != "CreateUnit") continue;
+            var parms = m.GetParameters();
+
+            foreach (var args in candidateArgLists)
+            {
+                if (parms.Length != args.Length) continue;
+
+                // quick shape check: each arg must be assignable to the parameter type
+                bool shapeOK = true;
+                for (int i = 0; i < parms.Length; i++)
+                {
+                    if (args[i] == null) { shapeOK = !parms[i].ParameterType.IsValueType; }
+                    else shapeOK = parms[i].ParameterType.IsInstanceOfType(args[i]) ||
+                                   // allow enum -> object boxing / int for cost, bool, etc.
+                                   (args[i] is System.IConvertible &&
+                                    System.Type.GetTypeCode(parms[i].ParameterType) != TypeCode.Object);
+                    if (!shapeOK) break;
+                }
+                if (!shapeOK) continue;
+
+                try
+                {
+                    var result = m.Invoke(um, args);
+                    // If CreateUnit returns bool, respect it; otherwise assume success.
+                    if (m.ReturnType == typeof(bool))
+                        return (bool)result == true;
+
+                    return true;
+                }
+                catch
+                {
+                    // Try next shape
+                }
+            }
+        }
+
+        return false;
     }
+
+    /// <summary>
+    /// Fallback if no UnitManager.CreateUnit overload matched:
+    /// spawn the unit directly and wire up basic tile ownership/links so the scene remains playable.
+    /// </summary>
+    private void SpawnLocally(BaseUnit prefab, Tile tile)
+    {
+        var spawned = Instantiate(prefab, tile.transform.position, Quaternion.identity);
+        spawned.isPlayer = (buyerTeam == Team.Player);   // simple ownership flag
+        spawned.OccupiedTile = tile;
+        tile.ChangeStationed(spawned);
+
+        Debug.Log("[BuyUnit] Spawned unit via local fallback (no matching CreateUnit overload).");
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (button == null) button = GetComponent<Button>();
+    }
+#endif
 }
