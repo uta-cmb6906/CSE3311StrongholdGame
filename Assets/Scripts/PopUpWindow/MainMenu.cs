@@ -11,6 +11,7 @@ public class MainMenu : MonoBehaviour
     public GameObject mainMenuPanel;
     //public GameObject optionsPanel;
     public GameObject difficultyPanel;
+    public GameObject tutorialPanel;
     public void PlayGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
@@ -44,6 +45,18 @@ public class MainMenu : MonoBehaviour
     public void CloseDifficultySettings()
     {
         difficultyPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
+    }
+
+    public void OpenTutorial()
+    {
+        mainMenuPanel.SetActive(false);
+        tutorialPanel.SetActive(true);
+    }
+
+    public void CloseTutorial()
+    {
+        tutorialPanel.SetActive(false);
         mainMenuPanel.SetActive(true);
     }
 
