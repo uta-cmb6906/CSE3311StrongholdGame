@@ -208,6 +208,128 @@ public class GameManager : MonoBehaviour
         foreach (BaseUnit unit in playerUnits) unit.ResetAction();
     }
 
+    private float enemyUnitActions(BaseUnit unit)
+    {
+        if (!unit.ActionpointRemaining()) return 1.0f;
+
+        // Check if any player unit is in attack range
+        BaseUnit targetInRange = null;
+        foreach (BaseUnit p in playerUnits)
+        {
+            if (p == null) continue;
+            int dx = Mathf.Abs(unit.OccupiedTile.X() - p.OccupiedTile.X());
+            int dy = Mathf.Abs(unit.OccupiedTile.Y() - p.OccupiedTile.Y());
+            if (dx <= unit.AttackRange() && dy <= unit.AttackRange())
+            {
+                targetInRange = p;
+                break;
+            }
+        }
+
+        if (targetInRange != null)
+        {
+            unit.AttemptAttack(targetInRange);
+            Debug.Log("Attack Test");
+            return 1.0f;
+        }
+
+        // No attack possible → choose movement behavior
+        int decision = UnityEngine.Random.Range(1, 4);
+
+        Tile targetTile = null;
+
+        // helper function to find nearest tile to a list of player units
+        Tile FindClosestTileTo()
+        {
+            Tile best = null;
+            float bestDistSq = float.MaxValue;
+            foreach (BaseUnit p in playerUnits)
+            {
+                if (p == null) continue;
+                int dx = unit.OccupiedTile.X() - p.OccupiedTile.X();
+                int dy = unit.OccupiedTile.Y() - p.OccupiedTile.Y();
+                float distSq = dx * dx + dy * dy;
+                if (distSq < bestDistSq)
+                {
+                    bestDistSq = distSq;
+                    best = p.OccupiedTile;
+                }
+            }
+            return best;
+        }
+
+        // helper for finding nearest player city
+        Tile FindClosestCityTile()
+        {
+            Tile best = null;
+            float bestDistSq = float.MaxValue;
+            foreach (CityTile c in playerCities)
+            {
+                if (c == null) continue;
+                int dx = unit.OccupiedTile.X() - c.X();
+                int dy = unit.OccupiedTile.Y() - c.Y();
+                float distSq = dx * dx + dy * dy;
+                if (distSq < bestDistSq)
+                {
+                    bestDistSq = distSq;
+                    best = c;
+                }
+            }
+            return best;
+        }
+
+        // Determine target destination
+        switch (decision)
+        {
+            case 1: // Move toward nearest player unit
+                targetTile = FindClosestTileTo();
+                break;
+
+            case 2: // Move toward nearest player city
+                targetTile = FindClosestCityTile();
+                break;
+
+            case 3: // Move toward player rally point
+                if (playerRallyPoint != null) targetTile = playerRallyPoint;
+                break;
+        }
+
+        if (targetTile == null) return 1.0f; // nothing to move toward
+
+        // Pick a tile closer to target within movement range
+        Tile bestTile = unit.OccupiedTile;
+        float bestDistSqToTarget = (bestTile.X() - targetTile.X()) * (bestTile.X() - targetTile.X()) + (bestTile.Y() - targetTile.Y()) * (bestTile.Y() - targetTile.Y());
+        int r = unit.MovementRange();
+        // search in a square area within movement range
+        for (int x = unit.OccupiedTile.X() - r; x <= unit.OccupiedTile.X() + r; x++)
+        {
+            for (int y = unit.OccupiedTile.Y() - r; y <= unit.OccupiedTile.Y() + r; y++)
+            {
+                Tile candidate = GridManager.Instance.GetTileAtPosition(new Vector3(x, y));
+                if (candidate == null) continue;
+                if (candidate.IsOccupied()) continue;
+
+                // ensure tile is actually in movement square (matches BaseUnit.HighlightValidTiles logic)
+                int dx = Mathf.Abs(unit.OccupiedTile.X() - x);
+                int dy = Mathf.Abs(unit.OccupiedTile.Y() - y);
+                if (dx > r || dy > r) continue;
+
+                float distSq = (candidate.X() - targetTile.X()) * (candidate.X() - targetTile.X()) +
+                               (candidate.Y() - targetTile.Y()) * (candidate.Y() - targetTile.Y());
+
+                if (distSq < bestDistSqToTarget)
+                {
+                    bestDistSqToTarget = distSq;
+                    bestTile = candidate;
+                }
+            }
+        }
+
+        if (bestTile != unit.OccupiedTile) unit.AttemptMovement(bestTile);
+        return 1.0f;
+    }
+
+
     public void EndPlayerTurn()
     {
         // if we are currently in the PlayerTurn state
@@ -283,7 +405,7 @@ public class GameManager : MonoBehaviour
             case GameState.EnemyTurn:
                 Debug.Log("[GM] -> EnemyTurn");
                 AddEnemyTurnGold();
-                StartCoroutine(WaitThenEndEnemyTurn(2.0f));
+                StartCoroutine(EnemyTurn());
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
@@ -293,15 +415,14 @@ public class GameManager : MonoBehaviour
     }
 
     //enemy turn
-    private IEnumerator WaitThenEndEnemyTurn(float delay)
+    private IEnumerator EnemyTurn()
     {
-        // Placeholder for AI work
-        yield return new WaitForSeconds(delay);
-
-        //hide message again after 2s
-        if (endTurnMessagePanel != null)
+        foreach (BaseUnit enemy in enemyUnits)
         {
-            endTurnMessagePanel.SetActive(false);
+            if (enemy == null) continue;
+
+            enemy.ResetAction();   // ✅ resets before acting
+            yield return new WaitForSeconds(enemyUnitActions(enemy)); 
         }
 
         // After delay, switch back to player turn, triggering PayoutTurnIncome() again
