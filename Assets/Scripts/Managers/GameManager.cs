@@ -417,7 +417,13 @@ public class GameManager : MonoBehaviour
     //enemy turn
     private IEnumerator EnemyTurn()
     {
-        foreach (BaseUnit enemy in enemyUnits)
+        if (endTurnMessagePanel.activeSelf)
+        {
+            yield return new WaitForSeconds(2.0f);
+            endTurnMessagePanel.SetActive(false);
+        }
+        var currentEnemies = new List<BaseUnit>(enemyUnits);
+        foreach (BaseUnit enemy in currentEnemies)
         {
             if (enemy == null) continue;
 
@@ -425,7 +431,7 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(enemyUnitActions(enemy)); 
         }
 
-        // After delay, switch back to player turn, triggering PayoutTurnIncome() again
+        // After delay, switch back to player turn
         ChangeState(GameState.PlayerTurn);
     }
 }
