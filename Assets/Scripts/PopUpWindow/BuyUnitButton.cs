@@ -14,10 +14,13 @@ public class BuyUnitButton : MonoBehaviour
     [Header("Unit to buy")]
     [Tooltip("Scriptable unit (holds the prefab) to create when this button is pressed.")]
     public ScriptableUnit unitToBuy;             // must expose UnitPrefab (BaseUnit)
-
-    [Header("Economy")]
-    [Tooltip("Optional cost to charge. If 0, no spending check is performed here.")]
-    public int cost = 0;
+        // NEW
+    [Tooltip("If >= 0, overrides ScriptableUnit.GoldCost; if < 0, uses the unit's cost.")]
+    public int overrideCost = -1;
+    
+    private int EffectiveCost =>
+        overrideCost >= 0 ? overrideCost :
+        (unitToBuy != null ? unitToBuy.GoldCost : 0);
 
     [Tooltip("Who pays / who owns the unit you spawn.")]
     public Team buyerTeam = Team.Player;
@@ -59,17 +62,28 @@ public class BuyUnitButton : MonoBehaviour
             return;
         }
 
-        // If a cost is set, try to pay it through GameManager (if your branch supports it).
-        if (cost > 0)
+        int costNow = EffectiveCost;
+        if (costNow > 0)
         {
             // If your GameManager has TrySpendGold, this will work.
-            // If it doesn't, set cost to 0 in the Inspector and no spending check is performed.
-            if (!GameManager.Instance.TrySpendGold(buyerTeam, cost))
+            // If it doesn't, leave overrideCost < 0 (uses unit cost) or set overrideCost to 0.
+            if (!GameManager.Instance.TrySpendGold(buyerTeam, costNow))
             {
                 Debug.Log("[BuyUnit] Not enough gold to buy this unit.");
                 return;
             }
         }
+        // If a cost is set, try to pay it through GameManager (if your branch supports it).
+        // if (cost > 0)
+        // {
+        //     // If your GameManager has TrySpendGold, this will work.
+        //     // If it doesn't, set cost to 0 in the Inspector and no spending check is performed.
+        //     if (!GameManager.Instance.TrySpendGold(buyerTeam, cost))
+        //     {
+        //         Debug.Log("[BuyUnit] Not enough gold to buy this unit.");
+        //         return;
+        //     }
+        // }
 
         // Try to call UnitManager.CreateUnit using whatever signature exists in your branch.
         var created = TryCreateViaUnitManager(unitToBuy.UnitPrefab, rally);
@@ -105,11 +119,11 @@ public class BuyUnitButton : MonoBehaviour
         object[][] candidateArgLists = new object[][]
         {
             // (BaseUnit, Tile, Team, int)  -> some branches pass cost explicitly
-            new object[] { prefab, tile, buyerTeam, cost },
+            new object[] { prefab, tile, buyerTeam, costNow },
             // (BaseUnit, Tile, Team)
             new object[] { prefab, tile, buyerTeam },
             // (BaseUnit, Tile, bool, Team, int) -> older branches with ignoreCost
-            new object[] { prefab, tile, false, buyerTeam, cost },
+            new object[] { prefab, tile, false, buyerTeam, costNow },
             // (BaseUnit, Tile) -> simplest branch
             new object[] { prefab, tile }
         };
