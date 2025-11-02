@@ -119,11 +119,11 @@ public class BuyUnitButton : MonoBehaviour
         object[][] candidateArgLists = new object[][]
         {
             // (BaseUnit, Tile, Team, int)  -> some branches pass cost explicitly
-            new object[] { prefab, tile, buyerTeam, costNow },
+            new object[] { prefab, tile, buyerTeam, EffectiveCost },
             // (BaseUnit, Tile, Team)
             new object[] { prefab, tile, buyerTeam },
             // (BaseUnit, Tile, bool, Team, int) -> older branches with ignoreCost
-            new object[] { prefab, tile, false, buyerTeam, costNow },
+            new object[] { prefab, tile, false, buyerTeam, EffectiveCost },
             // (BaseUnit, Tile) -> simplest branch
             new object[] { prefab, tile }
         };
