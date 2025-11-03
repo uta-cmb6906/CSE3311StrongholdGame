@@ -213,12 +213,19 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator EnemyEconomyPhase()
     {
+        Debug.Log("[GM] EnemyEconomyPhase starting...");
+
+        
         // ---------- BUY PHASE ----------
         int purchases = 0;
         while (purchases < enemyMaxPurchasesPerTurn)
         {
             // need a rally point and it must be free
-            if (enemyRallyPoint == null || enemyRallyPoint.IsOccupied()) break;
+            if (enemyRallyPoint == null || enemyRallyPoint.IsOccupied())
+            {
+            Debug.Log("[GM] EnemyEconomy: rally point null or occupied — skipping buy phase.");
+            break;
+            }
 
             int gold = GetGold(Team.Enemy);
             BaseUnit pick = null;
@@ -236,16 +243,22 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-            if (pick == null) break;
+            if (pick == null)
+            {
+            Debug.Log("[GM] EnemyEconomy: no affordable units found.");
+            break;
+            }
 
             if (TrySpendGold(Team.Enemy, pickCost))
             {
+                Debug.Log($"[GM] EnemyEconomy: buying {pick.name} for {pickCost} gold (remaining: {GetGold(Team.Enemy)})");
                 CreatePurchasedUnit(Team.Enemy, pick);
                 purchases++;
                 yield return new WaitForSeconds(enemyEconomyDelay);
             }
             else
             {
+                Debug.Log("[GM] EnemyEconomy: insufficient gold after check — aborting purchases.");
                 break; // wallet changed since choosing
             }
         }
@@ -258,12 +271,18 @@ public class GameManager : MonoBehaviour
             if (u == null) continue;
             if (upgrades >= enemyMaxUpgradesPerTurn) break;
 
-            if (!TrySpendGold(Team.Enemy, UpgradeCost)) break;
+            if (!TrySpendGold(Team.Enemy, UpgradeCost))
+            {
+            Debug.Log("[GM] EnemyEconomy: insufficient gold to upgrade — skipping.");
+            break;
+            }
 
             u.UpgradeUnit();
             upgrades++;
+            Debug.Log($"[GM] EnemyEconomy: upgraded {u.name} (remaining gold: {GetGold(Team.Enemy)})");
             yield return new WaitForSeconds(enemyEconomyDelay);
         }
+        Debug.Log("[GM] EnemyEconomyPhase complete.");
     }    
 
     
@@ -526,6 +545,7 @@ public enum GameState
     EnemyTurn
 
 }
+
 
 
 
