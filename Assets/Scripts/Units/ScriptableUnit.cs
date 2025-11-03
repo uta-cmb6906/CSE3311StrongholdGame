@@ -10,6 +10,9 @@ public class ScriptableUnit : ScriptableObject
 
     [Header("Economy")]
     public int GoldCost = 100;
+
+    [Header("UI Display")]
+    public Sprite Icon;
 }
 
 public enum Team
@@ -18,4 +21,5 @@ public enum Team
     Enemy
 
 }
+
 
