@@ -1699,9 +1699,37 @@ PrefabInstance:
       value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: enemyRallyPoint
+      value: 
+      objectReference: {fileID: 4978834772652963849, guid: 0e422b5f76b440b499e37bc4e0a2b2b4, type: 3}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
       propertyPath: endTurnMessagePanel
       value: 
       objectReference: {fileID: 162329858}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: enemyRecruitables.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: 'enemyRecruitables.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4471381179441271344, guid: e72d7cc42ab1a73438f42541589e3a05, type: 3}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: 'enemyRecruitables.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1133810985839691015, guid: aa16d0d395348d24195d42de950e785b, type: 3}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: 'enemyRecruitables.Array.data[2]'
+      value: 
+      objectReference: {fileID: 7702140265588612651, guid: d1ec74e3038b9a5439063d76e2dc1599, type: 3}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: 'enemyRecruitables.Array.data[3]'
+      value: 
+      objectReference: {fileID: 4211244057509780336, guid: 685907cbe7ed6a74eb72e7652b73ac32, type: 3}
+    - target: {fileID: 3763581952585200737, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
+      propertyPath: 'enemyRecruitables.Array.data[4]'
+      value: 
+      objectReference: {fileID: 4226853735422866853, guid: b0bb1f6f5b29a7540adb697dc5443288, type: 3}
     - target: {fileID: 8250319649214860848, guid: a2f548ecc9bb2444a97b27f15c24a2a0, type: 3}
       propertyPath: m_Name
       value: GameManager
@@ -1878,6 +1906,7 @@ GameObject:
   - component: {fileID: 1010844389}
   - component: {fileID: 1010844388}
   - component: {fileID: 1010844391}
+  - component: {fileID: 1010844392}
   m_Layer: 5
   m_Name: BuyUnit
   m_TagString: Untagged
@@ -1948,9 +1977,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1010844391}
-        m_TargetAssemblyTypeName: PopUp, Assembly-CSharp
-        m_MethodName: OpenPanel
+      - m_Target: {fileID: 1010844392}
+        m_TargetAssemblyTypeName: BuyUnitButton, Assembly-CSharp
+        m_MethodName: OnClickBuy
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2011,6 +2040,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PopUp
   Panel: {fileID: 2077796776}
+--- !u!114 &1010844392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010844386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77366cd2102947c4f984614e7fb3d08e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuyUnitButton
+  unitToBuy: {fileID: 11400000, guid: 3def753425fe45543be3c2207055301a, type: 2}
+  overrideCost: -1
+  buyerTeam: 0
+  button: {fileID: 1010844388}
 --- !u!1001 &1101697630
 PrefabInstance:
   m_ObjectHideFlags: 0
