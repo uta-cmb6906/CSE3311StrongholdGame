@@ -50,6 +50,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _playerGold;
     [SerializeField] private int _enemyGold;
 
+    [Header("Enemy Economy")]
+    [SerializeField] private List<BaseUnit> enemyRecruitables = new List<BaseUnit>(); // prefabs the enemy can buy
+    [SerializeField] private int enemyMaxPurchasesPerTurn = 2;
+    [SerializeField] private int enemyMaxUpgradesPerTurn = 1;
+    [SerializeField] private float enemyEconomyDelay = 0.15f; // pacing between actions
+    
+
     public int GetGold(Team who) => who == Team.Player ? _playerGold : _enemyGold;
 
     private void InitializeGold()
@@ -164,8 +171,22 @@ public class GameManager : MonoBehaviour
 
     private void CreatePurchasedUnit(Team team, BaseUnit unit)
     {
-        if (team == Team.Player) UnitManager.Instance.CreateUnit(unit, playerRallyPoint, true);
-        else UnitManager.Instance.CreateUnit(unit, playerRallyPoint, false);
+        // if (team == Team.Player) UnitManager.Instance.CreateUnit(unit, playerRallyPoint, true);
+        // else UnitManager.Instance.CreateUnit(unit, playerRallyPoint, false);
+        bool isPlayer = (team == Team.Player);
+
+        // keep old behavior as fallback
+        Tile spawnTile = playerRallyPoint;
+        if (!isPlayer && enemyRallyPoint != null)
+            spawnTile = enemyRallyPoint;
+
+        if (spawnTile == null || spawnTile.IsOccupied())
+        {
+            Debug.Log($"[GM] Spawn aborted: {(isPlayer ? "player" : "enemy")} rally unavailable/occupied.");
+            return;
+        }
+
+        UnitManager.Instance.CreateUnit(unit, spawnTile, isPlayer);
     }
 
     // Try to buy a castle on a given tile (prefab type kept generic)
@@ -189,6 +210,63 @@ public class GameManager : MonoBehaviour
         HighlightAvailableUnits();
         return true;
     }
+
+    private IEnumerator EnemyEconomyPhase()
+    {
+        // ---------- BUY PHASE ----------
+        int purchases = 0;
+        while (purchases < enemyMaxPurchasesPerTurn)
+        {
+            // need a rally point and it must be free
+            if (enemyRallyPoint == null || enemyRallyPoint.IsOccupied()) break;
+
+            int gold = GetGold(Team.Enemy);
+            BaseUnit pick = null;
+            int pickCost = -1;
+
+            // Greedy: most expensive affordable unit
+            foreach (var prefab in enemyRecruitables)
+            {
+                if (prefab == null) continue;
+                int cost = Mathf.Max(0, prefab.Cost());
+                if (cost <= gold && cost >= pickCost)
+                {
+                    pick = prefab;
+                    pickCost = cost;
+                }
+            }
+
+            if (pick == null) break;
+
+            if (TrySpendGold(Team.Enemy, pickCost))
+            {
+                CreatePurchasedUnit(Team.Enemy, pick);
+                purchases++;
+                yield return new WaitForSeconds(enemyEconomyDelay);
+            }
+            else
+            {
+                break; // wallet changed since choosing
+            }
+        }
+
+        // ---------- UPGRADE PHASE ----------
+        int upgrades = 0;
+        var snapshot = new List<BaseUnit>(enemyUnits); // copy in case list mutates
+        foreach (var u in snapshot)
+        {
+            if (u == null) continue;
+            if (upgrades >= enemyMaxUpgradesPerTurn) break;
+
+            if (!TrySpendGold(Team.Enemy, UpgradeCost)) break;
+
+            u.UpgradeUnit();
+            upgrades++;
+            yield return new WaitForSeconds(enemyEconomyDelay);
+        }
+    }    
+
+    
     // ===== ECONOMY: END =====
     public void HighlightAvailableUnits()
     {
@@ -422,6 +500,10 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(2.0f);
             endTurnMessagePanel.SetActive(false);
         }
+
+        // Spend the gold that was added in ChangeState -> EnemyTurn
+        yield return StartCoroutine(EnemyEconomyPhase());
+        
         var currentEnemies = new List<BaseUnit>(enemyUnits);
         foreach (BaseUnit enemy in currentEnemies)
         {
@@ -444,6 +526,7 @@ public enum GameState
     EnemyTurn
 
 }
+
 
 
 
