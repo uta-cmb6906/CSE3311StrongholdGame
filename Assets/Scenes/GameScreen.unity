@@ -1520,7 +1520,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &611236354
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2097,13 +2097,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2077796776}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 2077796780}
+        m_TargetAssemblyTypeName: BuyUnitPanel, Assembly-CSharp
+        m_MethodName: Show
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -4032,7 +4032,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 1.7173525, y: 0}
   m_SizeDelta: {x: 600, y: 350}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2077796778
@@ -4085,15 +4085,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0702843a581b6474cb5f196209a757d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuyUnitPanel
-  availableUnits:
-  - {fileID: 11400000, guid: 22a421623ec1ac64499fda3ed5d475e3, type: 2}
-  - {fileID: 11400000, guid: 38c1a34b839575f4b8175e66499beac1, type: 2}
-  - {fileID: 11400000, guid: 3def753425fe45543be3c2207055301a, type: 2}
-  - {fileID: 11400000, guid: 67a3292cbb756a049bf00c799c3ace5e, type: 2}
-  - {fileID: 11400000, guid: 3c7163c40008dd347995d4e0bfc385c5, type: 2}
-  unitButtonPrefab: {fileID: 7900181980296193081, guid: 45d204ab5f7c046fb982aa4c654b92e8, type: 3}
-  contentParent: {fileID: 2113168514}
-  closeOnPurchase: 1
+  AvailableUnits:
+  - {fileID: 11400000, guid: 7909143e956a0e94fbc5e20da498f37b, type: 2}
+  - {fileID: 11400000, guid: 2a09e185d341fa14c8d7e209df61fe95, type: 2}
+  - {fileID: 11400000, guid: da79973ec6945d049bc8a6d4d377155d, type: 2}
+  - {fileID: 11400000, guid: 509c479f93fb96542900e263c81663a8, type: 2}
+  - {fileID: 11400000, guid: e064130e7f425dd4da2b8dbbf0f4e339, type: 2}
+  UnitButtonPrefab: {fileID: 7900181980296193081, guid: 45d204ab5f7c046fb982aa4c654b92e8, type: 3}
+  ContentParent: {fileID: 2113168514}
+  CloseOnPurchase: 1
 --- !u!1 &2113168513
 GameObject:
   m_ObjectHideFlags: 0
@@ -4143,7 +4143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 0
+  m_HorizontalFit: 2
   m_VerticalFit: 2
 --- !u!114 &2113168516
 MonoBehaviour:
@@ -4154,23 +4154,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 2113168513}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GridLayoutGroup
   m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Left: 20
+    m_Right: 20
+    m_Top: 20
+    m_Bottom: 20
   m_ChildAlignment: 1
-  m_Spacing: 10
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_StartCorner: 0
+  m_StartAxis: 0
+  m_CellSize: {x: 180, y: 64}
+  m_Spacing: {x: 12, y: 12}
+  m_Constraint: 1
+  m_ConstraintCount: 2
 --- !u!1001 &8148995244306084015
 PrefabInstance:
   m_ObjectHideFlags: 0
