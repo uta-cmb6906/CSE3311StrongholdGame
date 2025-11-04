@@ -66,18 +66,26 @@ public class UnitManager : MonoBehaviour
 
     public void CreateUnit(BaseUnit unit, Tile spawnTile, bool isPlayer)
     {
-        var spawnedUnit = Instantiate(unit);
-        spawnTile.ChangeStationed(spawnedUnit);
-        spawnedUnit.OccupiedTile = spawnTile;
-        spawnedUnit.transform.position = spawnTile.transform.position;
+        // Spawn at the tile position
+        var spawnedUnit = Instantiate(unit, spawnTile.transform.position, Quaternion.identity);
 
-        //adjust for difficulty
+        //  Ownership/team
+        spawnedUnit.isPlayer = isPlayer;
+
+        //  Tile links
+        spawnedUnit.OccupiedTile = spawnTile;
+        spawnTile.ChangeStationed(spawnedUnit);
+
+        // Difficulty tweaks
         if (GameManager.Instance.difficulty == -1 && isPlayer) spawnedUnit.UpgradeUnit();
         if (GameManager.Instance.difficulty == 1 && !isPlayer) spawnedUnit.UpgradeUnit();
-        
-        //update stored units in GameManager
+
+        //  Register in the correct team list (AI uses these)
         if (isPlayer) GameManager.Instance.playerUnits.Add(spawnedUnit);
         else GameManager.Instance.enemyUnits.Add(spawnedUnit);
+
+        // (Nice UX) Let fresh units act right away
+        spawnedUnit.ResetAction();
     }
 
     public void SelectUnit(BaseUnit unit)
@@ -100,4 +108,5 @@ public class UnitManager : MonoBehaviour
         }
     }
 }
+
 
