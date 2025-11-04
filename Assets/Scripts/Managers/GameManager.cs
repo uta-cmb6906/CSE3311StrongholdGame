@@ -169,24 +169,82 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
+    // private void CreatePurchasedUnit(Team team, BaseUnit unit)
+    // {
+    //     // if (team == Team.Player) UnitManager.Instance.CreateUnit(unit, playerRallyPoint, true);
+    //     // else UnitManager.Instance.CreateUnit(unit, playerRallyPoint, false);
+    //     bool isPlayer = (team == Team.Player);
+
+    //     // keep old behavior as fallback
+    //     Tile spawnTile = playerRallyPoint;
+    //     if (!isPlayer && enemyRallyPoint != null)
+    //         spawnTile = enemyRallyPoint;
+
+    //     if (spawnTile == null || spawnTile.IsOccupied())
+    //     {
+    //         Debug.Log($"[GM] Spawn aborted: {(isPlayer ? "player" : "enemy")} rally unavailable/occupied.");
+    //         return;
+    //     }
+
+    //     UnitManager.Instance.CreateUnit(unit, spawnTile, isPlayer);
+    // }
     private void CreatePurchasedUnit(Team team, BaseUnit unit)
     {
-        // if (team == Team.Player) UnitManager.Instance.CreateUnit(unit, playerRallyPoint, true);
-        // else UnitManager.Instance.CreateUnit(unit, playerRallyPoint, false);
         bool isPlayer = (team == Team.Player);
+        Tile rally = isPlayer ? (Tile)playerRallyPoint : (Tile)enemyRallyPoint;
 
-        // keep old behavior as fallback
-        Tile spawnTile = playerRallyPoint;
-        if (!isPlayer && enemyRallyPoint != null)
-            spawnTile = enemyRallyPoint;
-
-        if (spawnTile == null || spawnTile.IsOccupied())
+        if (rally == null)
         {
-            Debug.Log($"[GM] Spawn aborted: {(isPlayer ? "player" : "enemy")} rally unavailable/occupied.");
+            Debug.Log("[GM] Spawn aborted: rally point missing.");
+            return;
+        }
+
+        // Find a free tile: prefer around rally, fall back to rally itself if empty
+        Tile spawnTile = FindFreeSpawnTileNear(rally);
+        if (spawnTile == null)
+        {
+            Debug.Log("[GM] Spawn aborted: No free tile near rally.");
             return;
         }
 
         UnitManager.Instance.CreateUnit(unit, spawnTile, isPlayer);
+
+        // Optional: ensure it can act now (esp. if CreateUnit marks it as used)
+        if (isPlayer && playerUnits.Count > 0)
+        {
+            var spawned = playerUnits[playerUnits.Count - 1];
+            if (spawned != null)
+            {
+                spawned.ResetAction();
+                UnitManager.Instance.SelectUnit(spawned);
+                HighlightAvailableUnits();
+            }
+        }
+    }
+
+    // Looks in a 1-tile ring around center; if none, uses center if empty
+    private Tile FindFreeSpawnTileNear(Tile center)
+    {
+        // 8-neighborhood around the rally (you can expand radius if you want)
+        int cx = center.X();
+        int cy = center.Y();
+
+        // First, try adjacent tiles
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                if (dx == 0 && dy == 0) continue;
+                var t = GridManager.Instance.GetTileAtPosition(new Vector3(cx + dx, cy + dy));
+                if (t != null && !t.IsOccupied())
+                    return t;
+            }
+        }
+    
+        // Fallback: allow spawning on rally itself if it’s free
+        if (!center.IsOccupied()) return center;
+    
+        return null;
     }
 
     // Try to buy a castle on a given tile (prefab type kept generic)
@@ -545,6 +603,7 @@ public enum GameState
     EnemyTurn
 
 }
+
 
 
 
