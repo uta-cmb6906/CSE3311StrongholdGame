@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 // CityTile has a controller (player or enemy) and a production value added to the controllers economy each turn
@@ -41,7 +42,6 @@ public class CityTile : Tile
     private void SwapOwner()
     {
         isPlayer = !isPlayer;
-
         // update GameManager's city lists
         if (isPlayer)
         {
@@ -53,7 +53,7 @@ public class CityTile : Tile
             GameManager.Instance.playerCities.Remove(this);
             GameManager.Instance.enemyCities.Add(this);
         }
-
+        spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = (isPlayer) ? playerCity : enemyCity;
     }
 
