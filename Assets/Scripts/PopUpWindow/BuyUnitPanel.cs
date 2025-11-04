@@ -69,7 +69,9 @@ public class BuyUnitPanel : MonoBehaviour
             var label = btn.GetComponentInChildren<TMP_Text>(true);
             if (label != null)
             {
-                int cost = Mathf.Max(0, su.GoldCost);
+                int cost = 0;
+                try { cost = su.UnitPrefab != null ? Mathf.Max(0, su.UnitPrefab.Cost()) : Mathf.Max(0, su.GoldCost); }
+                catch { cost = Mathf.Max(0, su.GoldCost); }
                 label.text = $"{su.name}  ({cost})";
             }
 
