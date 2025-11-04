@@ -6,22 +6,22 @@ using TMPro;
 public class BuyUnitPanel : MonoBehaviour
 {
     [Header("Units the player can buy")]
-    public List<ScriptableUnit> availableUnits = new List<ScriptableUnit>();
+    public List<ScriptableUnit> AvailableUnits = new List<ScriptableUnit>(); // drag ScriptableUnit assets here
 
     [Header("UI Prefab & Mount Point")]
-    public Button unitButtonPrefab;            // prefab with children: "Icon"(Image), "Label"(TMP)
-    public Transform contentParent;            // where buttons get spawned (Vertical/Grid Layout)
+    public Button UnitButtonPrefab;           // your UnitChoiceButton prefab (must have a TMP_Text child named Label or any TMP child)
+    public RectTransform ContentParent;       // the "Content" RectTransform under the panel
 
     [Header("Behavior")]
-    public bool closeOnPurchase = true;
+    public bool CloseOnPurchase = true;
 
-    // runtime
-    private readonly List<Button> spawned = new();
+    private readonly List<GameObject> _spawned = new();
 
     private void OnEnable()
     {
-        BuildIfNeeded();
-        RefreshButtons();
+        // build/refresh whenever panel opens
+        BuildList();
+        // update interactability when gold changes
         GameManager.OnGoldChanged += OnGoldChanged;
     }
 
@@ -30,46 +30,66 @@ public class BuyUnitPanel : MonoBehaviour
         GameManager.OnGoldChanged -= OnGoldChanged;
     }
 
-    private void OnGoldChanged(Team who, int _)
+    public void Show()
     {
-        if (who == Team.Player) RefreshButtons();
+        gameObject.SetActive(true);
+        BuildList();
     }
 
-    private void BuildIfNeeded()
+    public void Hide()
     {
-        if (spawned.Count > 0) return;
+        gameObject.SetActive(false);
+    }
 
-        if (unitButtonPrefab == null || contentParent == null)
+    private void OnGoldChanged(Team who, int _)
+    {
+        if (who == Team.Player) RefreshInteractable();
+    }
+
+    private void BuildList()
+    {
+        // clear old
+        foreach (var go in _spawned) if (go) Destroy(go);
+        _spawned.Clear();
+
+        if (!UnitButtonPrefab || !ContentParent)
         {
-            Debug.LogWarning("[BuyUnitPanel] Missing unitButtonPrefab or contentParent.");
+            Debug.LogWarning("[BuyUnitPanel] Missing UnitButtonPrefab or ContentParent.");
             return;
         }
 
-        for (int i = 0; i < availableUnits.Count; i++)
+        foreach (var su in AvailableUnits)
         {
-            var su = availableUnits[i];
             if (su == null || su.UnitPrefab == null) continue;
 
-            var btn = Instantiate(unitButtonPrefab, contentParent);
-            spawned.Add(btn);
+            var btn = Instantiate(UnitButtonPrefab, ContentParent);
+            _spawned.Add(btn.gameObject);
 
-            // Hook click
-            btn.onClick.AddListener(() => OnChoose(su));
-
-            // Fill visuals
-            var icon = btn.transform.Find("Icon")?.GetComponent<Image>();
-            var label = btn.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
-
-            if (icon && su.Icon != null) icon.sprite = su.Icon;        // optional; ok if null
-            if (label)
+            // label text (name + cost)
+            var label = btn.GetComponentInChildren<TMP_Text>(true);
+            if (label != null)
             {
-                int cost = Mathf.Max(0, su.GoldCost);                  // adjust if your field name differs
+                int cost = Mathf.Max(0, su.GoldCost);
                 label.text = $"{su.name}  ({cost})";
             }
+
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() =>
+            {
+                // central purchase path (spends + checks rally in your GameManager)
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.TryPurchaseUnit(su.UnitPrefab);
+                }
+                if (CloseOnPurchase) Hide();
+                else RefreshInteractable();
+            });
         }
+
+        RefreshInteractable();
     }
 
-    private void RefreshButtons()
+    private void RefreshInteractable()
     {
         var gm = GameManager.Instance;
         if (gm == null) return;
@@ -77,28 +97,18 @@ public class BuyUnitPanel : MonoBehaviour
         int gold = gm.GetGold(Team.Player);
         bool rallyBlocked = (gm.playerRallyPoint == null) || gm.playerRallyPoint.IsOccupied();
 
-        for (int i = 0; i < spawned.Count; i++)
+        int i = 0;
+        foreach (var su in AvailableUnits)
         {
-            var su = i < availableUnits.Count ? availableUnits[i] : null;
-            if (su == null) { spawned[i].interactable = false; continue; }
+            if (i >= _spawned.Count) break;
+            var go = _spawned[i++];
+            if (!go) continue;
+
+            var btn = go.GetComponent<Button>();
+            if (!btn || su == null) { if (btn) btn.interactable = false; continue; }
 
             int cost = Mathf.Max(0, su.GoldCost);
-            spawned[i].interactable = !rallyBlocked && gold >= cost;
+            btn.interactable = !rallyBlocked && gold >= cost;
         }
     }
-
-    private void OnChoose(ScriptableUnit su)
-    {
-        var gm = GameManager.Instance;
-        if (gm == null || su == null || su.UnitPrefab == null) return;
-
-        // Centralized purchase logic (spend + spawn at player rally)
-        bool ok = gm.TryPurchaseUnit(su.UnitPrefab);
-        if (ok && closeOnPurchase) gameObject.SetActive(false);
-        else RefreshButtons(); // e.g., if gold changed but spawn failed
-    }
-
-    // public helpers so external buttons can open/close it
-    public void Open()  => gameObject.SetActive(true);
-    public void Close() => gameObject.SetActive(false);
 }
