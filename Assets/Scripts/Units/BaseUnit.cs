@@ -31,6 +31,8 @@ public class BaseUnit : MonoBehaviour
 
     public bool ResetAction() => actionPointRemaining = true;
 
+    public bool DeleteAction() => actionPointRemaining = false;
+
     void Start()
     {
         maxHealth = health;

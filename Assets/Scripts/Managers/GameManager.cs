@@ -572,6 +572,10 @@ public class GameManager : MonoBehaviour
     //enemy turn
     private IEnumerator EnemyTurn()
     {
+        foreach (BaseUnit player in playerUnits)
+        {
+            player.DeleteAction();
+        }
         if (endTurnMessagePanel.activeSelf)
         {
             yield return new WaitForSeconds(2.0f);
@@ -587,8 +591,9 @@ public class GameManager : MonoBehaviour
             if (enemy == null) continue;
 
             enemy.ResetAction();   // ✅ resets before acting
-            yield return new WaitForSeconds(enemyUnitActions(enemy)); 
+            yield return new WaitForSeconds(enemyUnitActions(enemy));
         }
+        
 
         // After delay, switch back to player turn
         ChangeState(GameState.PlayerTurn);
