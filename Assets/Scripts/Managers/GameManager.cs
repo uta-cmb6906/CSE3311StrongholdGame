@@ -289,23 +289,43 @@ public class GameManager : MonoBehaviour
             BaseUnit pick = null;
             int pickCost = -1;
 
-            // Greedy: most expensive affordable unit
+            // Random: choose a random affordable unit instead of always the most expensive
+            var affordable = new List<BaseUnit>();
             foreach (var prefab in enemyRecruitables)
             {
                 if (prefab == null) continue;
                 int cost = Mathf.Max(0, prefab.Cost());
-                if (cost <= gold && cost >= pickCost)
-                {
-                    pick = prefab;
-                    pickCost = cost;
-                }
+                if (cost <= gold)
+                    affordable.Add(prefab);
             }
 
-            if (pick == null)
+            if (affordable.Count == 0)
             {
-            Debug.Log("[GM] EnemyEconomy: no affordable units found.");
-            break;
+                Debug.Log("[GM] EnemyEconomy: no affordable units found.");
+                break;
             }
+
+            // Pick a random one
+            BaseUnit pick = affordable[UnityEngine.Random.Range(0, affordable.Count)];
+            int pickCost = Mathf.Max(0, pick.Cost());
+            
+            // Greedy: most expensive affordable unit
+            // foreach (var prefab in enemyRecruitables)
+            // {
+            //     if (prefab == null) continue;
+            //     int cost = Mathf.Max(0, prefab.Cost());
+            //     if (cost <= gold && cost >= pickCost)
+            //     {
+            //         pick = prefab;
+            //         pickCost = cost;
+            //     }
+            // }
+
+            // if (pick == null)
+            // {
+            // Debug.Log("[GM] EnemyEconomy: no affordable units found.");
+            // break;
+            // }
 
             if (TrySpendGold(Team.Enemy, pickCost))
             {
@@ -608,6 +628,7 @@ public enum GameState
     EnemyTurn
 
 }
+
 
 
 
