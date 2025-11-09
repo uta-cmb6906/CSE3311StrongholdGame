@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
     //end turn message
     [Header("Difficulty")]
     [SerializeField] public int difficulty;
+    public static int GlobalDifficulty = 0;
 
     public static event Action<GameState> OnGameStateChanged;
 
@@ -55,7 +56,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int enemyMaxPurchasesPerTurn = 2;
     [SerializeField] private int enemyMaxUpgradesPerTurn = 1;
     [SerializeField] private float enemyEconomyDelay = 0.15f; // pacing between actions
-    
+
 
     public int GetGold(Team who) => who == Team.Player ? _playerGold : _enemyGold;
 
@@ -240,10 +241,10 @@ public class GameManager : MonoBehaviour
                     return t;
             }
         }
-    
+
         // Fallback: allow spawning on rally itself if it’s free
         if (!center.IsOccupied()) return center;
-    
+
         return null;
     }
 
@@ -273,7 +274,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("[GM] EnemyEconomyPhase starting...");
 
-        
+
         // ---------- BUY PHASE ----------
         int purchases = 0;
         while (purchases < enemyMaxPurchasesPerTurn)
@@ -281,8 +282,8 @@ public class GameManager : MonoBehaviour
             // need a rally point and it must be free
             if (enemyRallyPoint == null || enemyRallyPoint.IsOccupied())
             {
-            Debug.Log("[GM] EnemyEconomy: rally point null or occupied — skipping buy phase.");
-            break;
+                Debug.Log("[GM] EnemyEconomy: rally point null or occupied — skipping buy phase.");
+                break;
             }
 
             int gold = GetGold(Team.Enemy);
@@ -308,7 +309,7 @@ public class GameManager : MonoBehaviour
             // Pick a random one
             // BaseUnit pick = affordable[UnityEngine.Random.Range(0, affordable.Count)];
             // int pickCost = Mathf.Max(0, pick.Cost());
-            
+
             // Greedy: most expensive affordable unit
             foreach (var prefab in enemyRecruitables)
             {
@@ -323,8 +324,8 @@ public class GameManager : MonoBehaviour
 
             if (pick == null)
             {
-            Debug.Log("[GM] EnemyEconomy: no affordable units found.");
-            break;
+                Debug.Log("[GM] EnemyEconomy: no affordable units found.");
+                break;
             }
 
             if (TrySpendGold(Team.Enemy, pickCost))
@@ -351,8 +352,8 @@ public class GameManager : MonoBehaviour
 
             if (!TrySpendGold(Team.Enemy, UpgradeCost))
             {
-            Debug.Log("[GM] EnemyEconomy: insufficient gold to upgrade — skipping.");
-            break;
+                Debug.Log("[GM] EnemyEconomy: insufficient gold to upgrade — skipping.");
+                break;
             }
 
             u.UpgradeUnit();
@@ -361,9 +362,9 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(enemyEconomyDelay);
         }
         Debug.Log("[GM] EnemyEconomyPhase complete.");
-    }    
+    }
 
-    
+
     // ===== ECONOMY: END =====
     public void HighlightAvailableUnits()
     {
@@ -536,6 +537,9 @@ public class GameManager : MonoBehaviour
         // ===== ECONOMY: initialize wallets =====
         InitializeGold();
 
+        //difficulty field
+        difficulty = GlobalDifficulty;
+
         //hidden endturn message
         if (endTurnMessagePanel != null)
         {
@@ -604,7 +608,7 @@ public class GameManager : MonoBehaviour
 
         // Spend the gold that was added in ChangeState -> EnemyTurn
         yield return StartCoroutine(EnemyEconomyPhase());
-        
+
         var currentEnemies = new List<BaseUnit>(enemyUnits);
         foreach (BaseUnit enemy in currentEnemies)
         {
@@ -613,7 +617,7 @@ public class GameManager : MonoBehaviour
             enemy.ResetAction();   // ✅ resets before acting
             yield return new WaitForSeconds(enemyUnitActions(enemy));
         }
-        
+
 
         // After delay, switch back to player turn
         ChangeState(GameState.PlayerTurn);

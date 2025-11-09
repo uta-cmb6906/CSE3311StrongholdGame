@@ -9,7 +9,7 @@ public class MainMenu : MonoBehaviour
 
     [Header("Menu Panels")]
     public GameObject mainMenuPanel;
-    //public GameObject optionsPanel;
+    public GameObject mapPanel;
     public GameObject difficultyPanel;
     public GameObject tutorialPanel;
     public void PlayGame()
@@ -23,28 +23,37 @@ public class MainMenu : MonoBehaviour
         Debug.Log("Quitting...");
     }
 
-    // public void OpenOptions()
-    // {
-    //     mainMenuPanel.SetActive(false);
-    //     optionsPanel.SetActive(false);
-    //     difficultyPanel.SetActive(false);
-    // }
-
-    // public void CloseOptions()
-    // {
-    //     optionsPanel.SetActive(false);
-    //     mainMenuPanel.SetActive(true);
-    // }
-
-    public void OpenDifficultySettings()
+    //methods to handle the Difficulty Panel
+    public void OpenDifficulty()
     {
         mainMenuPanel.SetActive(false);
         difficultyPanel.SetActive(true);
     }
 
-    public void CloseDifficultySettings()
+    public void CloseDifficulty()
     {
         difficultyPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
+    }
+
+    //method to set the difficulty and close the panel
+    public void SetDifficultyAndClose(int value)
+    {
+        GameManager.GlobalDifficulty = value;
+        Debug.Log($"[MainMenu] Setting global difficulty to: {value}");
+
+        CloseDifficulty();
+    }
+
+    public void OpenMap()
+    {
+        mainMenuPanel.SetActive(false);
+        mapPanel.SetActive(true);
+    }
+
+    public void CloseMap()
+    {
+        mapPanel.SetActive(false);
         mainMenuPanel.SetActive(true);
     }
 
@@ -60,22 +69,22 @@ public class MainMenu : MonoBehaviour
         mainMenuPanel.SetActive(true);
     }
 
-    // all the difficulty settings logic will implement it later
+    // all the Map settings logic will implement it later
 
     // Implemented :)
-    public void SetDifficulty(string difficultyLevel)
+    public void SetMap(string mapType)
     {
-        Debug.Log("Difficulty is set to " + difficultyLevel);
+        Debug.Log("Map is set to " + mapType);
 
-        switch (difficultyLevel)
+        switch (mapType)
         {
-            case "Easy":
+            case "Map 1":
                 MapToLoad = "MapData1";
                 break;
-            case "Medium":
+            case "Map 2":
                 MapToLoad = "MapData2";
                 break;
-            case "Hard":
+            case "Map 3":
                 MapToLoad = "MapData3";
                 break;
             default:
@@ -83,6 +92,6 @@ public class MainMenu : MonoBehaviour
                 break;
         }
         Debug.Log($"Map set to load: {MapToLoad}.csv");
-        CloseDifficultySettings();
+        CloseMap();
     }
 }
