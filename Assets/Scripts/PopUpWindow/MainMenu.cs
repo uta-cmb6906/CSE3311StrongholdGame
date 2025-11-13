@@ -84,11 +84,11 @@ public class MainMenu : MonoBehaviour
             case "Map 2":
                 MapToLoad = "MapData2";
                 break;
-            case "Map 3":
-                MapToLoad = "MapData3";
+            case "Random":
+                MapToLoad = "RandomMap";
                 break;
             default:
-                MapToLoad = "MapData";
+                MapToLoad = "RandomMap";
                 break;
         }
         Debug.Log($"Map set to load: {MapToLoad}.csv");

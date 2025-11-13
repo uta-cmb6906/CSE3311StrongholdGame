@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public static string MapToLoad = "MapData";
+    public static string MapToLoad = "RandomMap";
     public GameState GameState;
 
     // Make a list of player cities/units

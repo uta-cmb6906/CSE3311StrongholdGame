@@ -10,7 +10,7 @@ using NUnit.Framework;
 public class GridManager : MonoBehaviour
 {
     public static GridManager Instance;
-    private int _width = 20, _height = 10;
+    public int _width = 20, _height = 10;
     [SerializeField] public PlainsTile plains;
     [SerializeField] private ForestTile forest;
     [SerializeField] private RiverTile river;
@@ -45,10 +45,87 @@ public class GridManager : MonoBehaviour
 
     public void GenerateGrid(string map)
     {
-        CreateSpecialTiles(map);
-        CreatePlainsTiles();
+        if (map == "RandomMap")
+        {
+            MakeRandomMap();
+        }
+        else
+        {
+            CreateSpecialTiles(map);
+            CreatePlainsTiles();
+        }
+        
         CenterCamera();
         GameManager.Instance.ChangeState(GameState.SpawnFactions);
+    }
+
+    public void MakeRandomMap()
+    {
+        int playerCities = 0;
+        int enemyCities = 0;
+        int randomInt;
+
+        for(int x = 0; x < GridManager.Instance._width; x++)
+        {
+            for(int y = 0; y < GridManager.Instance._height; y++)
+            {
+                //player rally point
+                if (x == 1 && y == 5)
+                {
+                    CreateTile(x, y, rallyPoint, true);
+                }
+                //enemy rally point
+                else if (x == 18 && y == 5)
+                {
+                    CreateTile(x, y, rallyPoint, false);
+                }
+                //other tiles
+                else
+                {
+                    randomInt = UnityEngine.Random.Range(0, 100);
+                    //plains 60%
+                    if (randomInt < 60)
+                    {
+                        CreateTile(x, y, plains, false);
+                    }
+                    //forest 8%
+                    else if (randomInt < 68)
+                    {
+                        CreateTile(x, y, forest, false);
+                    }
+                    //river 8%
+                    else if (randomInt < 76)
+                    {
+                        CreateTile(x, y, river, false);
+                    }
+                    //mountain 8%
+                    else if (randomInt < 84)
+                    {
+                        CreateTile(x, y, mountain, false);
+                    }
+                    //player city 8%
+                    else if (randomInt < 92)
+                    {
+                        if (x <= 7 && playerCities < 3)
+                        {
+                            CreateTile(x, y, city, true);
+                            playerCities++;
+                        }
+                        else CreateTile(x, y, plains, false);
+                    }
+                    //enemy city 8%
+                    else
+                    {
+                        if (x >= 12 && enemyCities < 3)
+                        {
+                            CreateTile(x, y, city, false);
+                            enemyCities++;
+                        }
+                        else CreateTile(x, y, plains, false);
+                    }
+                }
+            }
+        }
     }
 
     //use povided map to populate all special tiles on map
