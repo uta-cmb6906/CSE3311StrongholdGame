@@ -1,13 +1,19 @@
 using System;
 using UnityEngine;
+using TMPro; 
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public static string MapToLoad = "RandomMap";
     public GameState GameState;
+
+    public GameObject winnerPanel;
+
+    public TextMeshProUGUI winnerText;
 
     // Make a list of player cities/units
     public List<CityTile> playerCities = new List<CityTile>();
@@ -287,8 +293,8 @@ public class GameManager : MonoBehaviour
             }
 
             int gold = GetGold(Team.Enemy);
-            //BaseUnit pick = null;
-            //int pickCost = -1;
+            BaseUnit pick = null;
+            int pickCost = -1;
 
             // // Random: choose a random affordable unit instead of always the most expensive
             // var affordable = new List<BaseUnit>();
@@ -405,7 +411,6 @@ public class GameManager : MonoBehaviour
         if (targetInRange != null)
         {
             unit.AttemptAttack(targetInRange);
-            Debug.Log("Attack Test");
             return 1.0f;
         }
 
@@ -621,6 +626,25 @@ public class GameManager : MonoBehaviour
 
         // After delay, switch back to player turn
         ChangeState(GameState.PlayerTurn);
+    }
+
+    public void EndGame(string winner)
+    {
+        winnerPanel.SetActive(true);
+        winnerText.text = "And the winner is the " + winner;
+        StartCoroutine(EndGameText());
+    }
+
+    IEnumerator EndGameText()
+    {
+        yield return new WaitForSeconds(5);
+        winnerPanel.SetActive(false);
+        ChangeScene("MainMenu");
+    }
+
+    public void ChangeScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
     }
 }
 

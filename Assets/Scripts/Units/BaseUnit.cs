@@ -149,6 +149,15 @@ public class BaseUnit : MonoBehaviour
         else enemy.TakeDamage(rangedDamage, enemyDefense);
 
         actionPointRemaining = false;
+
+        //End Game Logic
+        if(GameManager.Instance.playerUnits.Count <= 0)
+        {
+            GameManager.Instance.EndGame("enemy");
+        } else if(GameManager.Instance.enemyUnits.Count <= 0)
+        {
+            GameManager.Instance.EndGame("player");
+        }else
         GameManager.Instance.HighlightAvailableUnits();
     }
 
