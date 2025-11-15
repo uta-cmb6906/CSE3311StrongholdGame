@@ -287,8 +287,8 @@ public class GameManager : MonoBehaviour
             }
 
             int gold = GetGold(Team.Enemy);
-            //BaseUnit pick = null;
-            //int pickCost = -1;
+            BaseUnit pick = null;
+            int pickCost = -1;
 
             // // Random: choose a random affordable unit instead of always the most expensive
             // var affordable = new List<BaseUnit>();
@@ -632,6 +632,7 @@ public enum GameState
     EnemyTurn
 
 }
+
 
 
 
