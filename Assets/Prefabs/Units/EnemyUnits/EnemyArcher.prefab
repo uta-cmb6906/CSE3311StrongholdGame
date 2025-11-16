@@ -361,7 +361,7 @@ MonoBehaviour:
   OccupiedTile: {fileID: 0}
   isPlayer: 0
   maxHealth: 0
-  cost: 30
+  cost: 50
   health: 80
   defense: 10
   movementRange: 2
