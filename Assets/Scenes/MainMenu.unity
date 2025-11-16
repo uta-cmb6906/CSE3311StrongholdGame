@@ -312,7 +312,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Blocks path
+  m_text: Defense bonus
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 53998b3a35ca675459857338d2a7ed6f, type: 2}
   m_sharedMaterial: {fileID: 3098573259623453821, guid: 53998b3a35ca675459857338d2a7ed6f, type: 2}
@@ -1967,7 +1967,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Impassable
+  m_text: Defense bonus
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 53998b3a35ca675459857338d2a7ed6f, type: 2}
   m_sharedMaterial: {fileID: 3098573259623453821, guid: 53998b3a35ca675459857338d2a7ed6f, type: 2}
