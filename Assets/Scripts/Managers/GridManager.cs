@@ -25,7 +25,7 @@ public class GridManager : MonoBehaviour
         if (_cam != null) return _cam.GetComponent<Camera>();
         return Camera.main;
     }
-    
+
     //ensure all scenes are using the same instance of the manager
     void Awake()
     {
@@ -40,7 +40,12 @@ public class GridManager : MonoBehaviour
             return;
         }
         if (_cam == null && Camera.main != null)
-        _cam = Camera.main.transform;
+            _cam = Camera.main.transform;
+    }
+    
+    public void DestroyThisInstance()
+    {
+        Destroy(gameObject);
     }
 
     public void GenerateGrid(string map)

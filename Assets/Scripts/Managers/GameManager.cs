@@ -7,6 +7,10 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+
+    // Make a list of player cities/units
+    // Make list of enemy cities/units
+    
     public static GameManager Instance;
     public static string MapToLoad = "RandomMap";
     public GameState GameState;
@@ -584,6 +588,11 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void StartGenerate()
+    {
+        Start();
+    }
+
     //start on state generate Grid
     void Start()
     {
@@ -658,6 +667,7 @@ public class GameManager : MonoBehaviour
         winnerPanel.SetActive(true);
         winnerText.text = "And the winner is the " + winner;
         StartCoroutine(EndGameText());
+        
     }
 
     IEnumerator EndGameText()
@@ -665,6 +675,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(5);
         winnerPanel.SetActive(false);
         ChangeScene("MainMenu");
+        Destroy(gameObject);
+        GridManager.Instance.DestroyThisInstance();
+        UnitManager.Instance.DestroyThisInstance();
     }
 
     public void ChangeScene(string sceneName)

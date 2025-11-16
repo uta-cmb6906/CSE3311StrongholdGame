@@ -26,6 +26,11 @@ public class UnitManager : MonoBehaviour
         _units = Resources.LoadAll<ScriptableUnit>("Units").ToList();
     }
 
+    public void DestroyThisInstance()
+    {
+        Destroy(gameObject);
+    }
+
     //Spawn all initial player and enemy units
     public void SpawnFactions(string playerFaction, string enemyFaction)
     {
