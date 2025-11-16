@@ -282,6 +282,8 @@ public class GameManager : MonoBehaviour
 
 
         // ---------- BUY PHASE ----------
+        
+        
         int purchases = 0;
         while (purchases < enemyMaxPurchasesPerTurn)
         {
@@ -292,9 +294,9 @@ public class GameManager : MonoBehaviour
                 break;
             }
 
-            int gold = GetGold(Team.Enemy);
-            BaseUnit pick = null;
-            int pickCost = -1;
+        //     int gold = GetGold(Team.Enemy);
+        //     BaseUnit pick = null;
+        //     int pickCost = -1;
 
             // // Random: choose a random affordable unit instead of always the most expensive
             // var affordable = new List<BaseUnit>();
@@ -317,23 +319,46 @@ public class GameManager : MonoBehaviour
             // int pickCost = Mathf.Max(0, pick.Cost());
 
             // Greedy: most expensive affordable unit
-            foreach (var prefab in enemyRecruitables)
+            // foreach (var prefab in enemyRecruitables)
+            // {
+            //     if (prefab == null) continue;
+            //     int cost = Mathf.Max(0, prefab.Cost());
+            //     if (cost <= gold && cost >= pickCost)
+            //     {
+            //         pick = prefab;
+            //         pickCost = cost;
+            //     }
+            // }
+
+            // if (pick == null)
+            // {
+            //     Debug.Log("[GM] EnemyEconomy: no affordable units found.");
+            //     break;
+            // }
+        // if no recruitables are set up, bail
+            if (enemyRecruitables == null || enemyRecruitables.Count == 0)
             {
-                if (prefab == null) continue;
-                int cost = Mathf.Max(0, prefab.Cost());
-                if (cost <= gold && cost >= pickCost)
-                {
-                    pick = prefab;
-                    pickCost = cost;
-                }
+                Debug.Log("[GM] EnemyEconomy: no recruitable units configured.");
+                break;
+            }
+
+            // pick a random unit from the list (no affordability check)
+            BaseUnit pick = null;
+            // guard against nulls in the list
+            for (int safety = 0; safety < 10 && pick == null; safety++)
+            {
+                pick = enemyRecruitables[UnityEngine.Random.Range(0, enemyRecruitables.Count)];
             }
 
             if (pick == null)
             {
-                Debug.Log("[GM] EnemyEconomy: no affordable units found.");
+                Debug.Log("[GM] EnemyEconomy: all recruitables are null, aborting.");
                 break;
             }
 
+            int pickCost = Mathf.Max(0, pick.Cost());
+            
+                // spending gold
             if (TrySpendGold(Team.Enemy, pickCost))
             {
                 Debug.Log($"[GM] EnemyEconomy: buying {pick.name} for {pickCost} gold (remaining: {GetGold(Team.Enemy)})");
@@ -656,6 +681,7 @@ public enum GameState
     EnemyTurn
 
 }
+
 
 
 
