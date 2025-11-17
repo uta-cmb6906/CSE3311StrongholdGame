@@ -12,6 +12,7 @@ public class MainMenu : MonoBehaviour
     public GameObject mapPanel;
     public GameObject difficultyPanel;
     public GameObject tutorialPanel;
+    
     public void PlayGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
